@@ -1,0 +1,4 @@
+NAME d3d8.dll
+
+EXPORTS
+Direct3DCreate8=myDirect3DCreate8

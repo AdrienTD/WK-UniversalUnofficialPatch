@@ -1,0 +1,6 @@
+*.obj
+*.lib
+*.res
+*.exp
+
+d3d8.dll
