@@ -3,6 +3,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdio.h>
+#include <dshow.h>
 
 #define naked __declspec(naked)
 
@@ -25,12 +26,15 @@ extern char setting_higher_time_precision, setting_custom_campaign_crash_fix,
 	setting_zero_allocated_memory, setting_sight_range_events_bugfix,
 	setting_custom_multiplayer_maps, setting_trace_filter,
 	setting_no_tutorial_in_skirmish, setting_map_editor_button,
-	setting_map_editor_hacks;
+	setting_map_editor_hacks, setting_dshow_force_ms_mpeg_codecs,
+	setting_dshow_no_default_syncsrc, setting_show_all_screen_resolutions,
+	setting_dshow_waitforcompletion_immediate;
 
 void atow(char *a, wchar_t *w, uint ms);
 DWORD WINAPI myGetTickCount(void);
 void SetImmediateJump(void *p, uint j);
 void SetMemProtection(void *mem, int flags);
+int __stdcall BuildMsMpegGraph(IGraphBuilder *gb, IPin *psrcout);
 
 void PatchStart_WKO();
 void PatchStart_WKB();

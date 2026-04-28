@@ -3,7 +3,7 @@
 
 #include "global.h"
 
-typedef BOOL (WINAPI *ftDirect3DCreate8)(int SDKVersion);
+typedef void *(WINAPI *ftDirect3DCreate8)(int SDKVersion);
 
 char title[] = "WK Universal Unofficial Patch";
 HMODULE d3d8 = 0;
@@ -19,7 +19,9 @@ char setting_higher_time_precision = 1, setting_custom_campaign_crash_fix = 1,
 	setting_zero_allocated_memory = 0, setting_sight_range_events_bugfix = 1,
 	setting_custom_multiplayer_maps = 1, setting_trace_filter = 0,
 	setting_no_tutorial_in_skirmish = 1, setting_map_editor_button = 1,
-	setting_map_editor_hacks = 1;
+	setting_map_editor_hacks = 1, setting_dshow_force_ms_mpeg_codecs = 1,
+	setting_dshow_no_default_syncsrc = 0, setting_show_all_screen_resolutions = 1,
+	setting_dshow_waitforcompletion_immediate = 1;
 
 void atow(char *a, wchar_t *w, uint ms)
 {
@@ -31,7 +33,7 @@ void atow(char *a, wchar_t *w, uint ms)
 	w[l] = 0;
 }
 
-BOOL WINAPI myDirect3DCreate8(int SDKVersion)
+void *WINAPI myDirect3DCreate8(int SDKVersion)
 {
 	char tbuf[128];
 	if(!d3d8)
@@ -57,6 +59,50 @@ DWORD WINAPI myGetTickCount(void)
 	QueryPerformanceFrequency(&freq);
 	QueryPerformanceCounter(&count);
 	return (count.QuadPart * 1000) / freq.QuadPart;
+}
+
+void msmpegfailedmsg(int x)
+{
+	char b[256];
+	sprintf(b, "Failed to build graph with only MS MPEG codecs!\nReason: %i\nPlease tell me about this problem! Thanks!", x);
+	MessageBox(0, b, title, 16);
+	ExitProcess(-1);
+}
+
+#define msmpegfail(x) if(FAILED(hr)) msmpegfailedmsg(x);
+
+int __stdcall BuildMsMpegGraph(IGraphBuilder *gb, IPin *psrcout)
+{
+	HRESULT hr;
+	IBaseFilter *mss, *mad;
+	IPin *pmssin, *pmssout, *pmadin, *pmadout;
+
+	hr = CoCreateInstance(&CLSID_MPEG1Splitter, NULL, CLSCTX_INPROC_SERVER, &IID_IBaseFilter, (void**)&mss);
+	msmpegfail(1);
+	hr = CoCreateInstance(&CLSID_CMpegAudioCodec, NULL, CLSCTX_INPROC_SERVER, &IID_IBaseFilter, (void**)&mad);
+	msmpegfail(2);
+
+	hr = gb->lpVtbl->AddFilter(gb, mss, L"WKUUP MPEG Stream Splitter"); msmpegfail(3);
+	hr = gb->lpVtbl->AddFilter(gb, mad, L"WKUUP MPEG Audio Decoder"); msmpegfail(4);
+
+	hr = mss->lpVtbl->FindPin(mss, L"Input", &pmssin);		msmpegfail(5);
+	hr = mad->lpVtbl->FindPin(mad, L"In", &pmadin);			msmpegfail(6);
+	hr = gb->lpVtbl->ConnectDirect(gb, psrcout, pmssin, NULL);	msmpegfail(7);
+	hr = mss->lpVtbl->FindPin(mss, L"Audio", &pmssout);		msmpegfail(8);
+	hr = gb->lpVtbl->ConnectDirect(gb, pmssout, pmadin, NULL);	msmpegfail(9);
+	hr = mad->lpVtbl->FindPin(mad, L"Out", &pmadout);		msmpegfail(10);
+	hr = gb->lpVtbl->Render(gb, pmadout);				msmpegfail(11);
+
+	pmssin->lpVtbl->Release(pmssin);
+	pmssout->lpVtbl->Release(pmssout);
+	pmadin->lpVtbl->Release(pmadin);
+	pmadout->lpVtbl->Release(pmadout);
+	mss->lpVtbl->Release(mss);
+	mad->lpVtbl->Release(mad);
+
+	//MessageBox(0, "Success!", 0, 64);
+	//hr = -1; msmpegfail(1999);
+	return 0;
 }
 
 void SetImmediateJump(void *p, uint j)
@@ -130,6 +176,14 @@ void ReadSettings()
 			setting_map_editor_button = p;
 		else if(!stricmp(s, "map_editor_hacks"))
 			setting_map_editor_hacks = p;
+		else if(!stricmp(s, "dshow_force_ms_mpeg_codecs"))
+			setting_dshow_force_ms_mpeg_codecs = p;
+		else if(!stricmp(s, "dshow_no_default_syncsrc"))
+			setting_dshow_no_default_syncsrc = p;
+		else if(!stricmp(s, "show_all_screen_resolutions"))
+			setting_show_all_screen_resolutions = p;
+		else if(!stricmp(s, "dshow_waitforcompletion_immediate"))
+			setting_dshow_waitforcompletion_immediate = p;
 	}
 	fclose(f);
 }

@@ -1,5 +1,5 @@
 WK Universal Unofficial Patch
-Version 0.91
+Version 0.92
 By AdrienTD
 
 
@@ -8,6 +8,17 @@ This is an unofficial patch for Warrior Kings 1.4 (Build 366) and
 Warrior Kings - Battles v1.23 (Build 152) that fixes certain bugs and adds
 new features.
 
+It is a small d3d8.DLL file that, once loaded by the game, will patch the
+game's code in the RAM memory before the game gets launched. It redirects
+Direct3D calls to either "apd3d8.dll" if found in the executable directory,
+or the system's real d3d8.dll.
+
+
+
++---------------+
+|    Content    |
++---------------+
+
 This patch contains:
 
  - Higher time precision, fixing the famous unit teleportation bug.
@@ -15,8 +26,24 @@ This patch contains:
  - (WKO*) Bug where sight range events are sometimes not sent is now fixed.
     -> Fixes watchtowers/forts sometimes not firing/alerting automatically.
     -> Fixes bug where the barbarians won't come to you in the second celestial
-       level (the Rescue the Train mission).
+       level (the Rescue Tomas mission).
     -> Fixes lots of other bugs related to sight range.
+
+ - [NEW!] Music bug fixes, including:
+
+    - Forcing the game to use the default MPEG audio decoder provided by
+      Windows, instead of using custom third-party codecs that can cause
+      bugs and other problems.
+
+    - The game has the tendency to wait some milliseconds doing nothing else
+      to determinate if the music has stopped or not, which can have an impact
+      on performance. The patch will remove this wait, making the game
+      smoother. In the first WK, the mission introduction cinematic with the
+      narrator now becomes significantly smoother, going from 16 FPS to
+      60 FPS!
+
+ - [NEW!] (WKB²) Widescreen resolutions are now available in the graphics
+   options screen.
 
  - Modding abilities, including:
 
@@ -31,45 +58,26 @@ This patch contains:
     - (WKO*) Selecting a custom campaign (by placing a CAM file inside the
       "Campaigns" directory in data(.bcp)/saved) won't crash anymore.
 
-    - NEW! You can add maps in the multiplayer/skirmish map list.
+    - You can add maps in the multiplayer/skirmish map list.
 
     - (WKB²) Map editor enabled, with some bug fixes.
 
-Optional features:
- - Enable the TRACE and/or TRACE_VALUE actions.
- - (WKO*) Full memory with 0 after allocation.
+ - Optional features:
+
+   - Enable the TRACE and/or TRACE_VALUE actions.
+
+   - (WKO*) Full memory with 0 after allocation.
 
 * only for the first Warrior Kings
 ² only for Warrior Kings - Battles
-
-It is a small d3d8.DLL file that, once loaded by the game, will patch the
-game's code in the RAM memory before the game gets launched. It redirects
-Direct3D calls to either "apd3d8.dll" if found in the executable directory,
-or the system's real d3d8.dll.
-
-
-
-+--------------------------+
-|    Multiplayer notice    |
-+--------------------------+
-
-  The patch can be used to play multiplayer games.
-
-  Persons using this patch may be able to play with others who don't have it.
-However this is not recommended because this could cause some problems.
-
-  If you aren't able to join multiplayer games, removing temporarily the patch
-is a potential fix.
-
-  If you want to play multiplayer games with mods and/or custom maps, then
-everyone must have the mod files installed. Also, this patch must also
-be installed by everyone if the mod(s) require it.
 
 
 
 +--------------------+
 |    Installation    |
 +--------------------+
+
+   /!\ Please do NOT copy the patch DLL to system32.
 
 Definition:
   The "game's directory" is where there is the executable (exe) of the game.
@@ -95,6 +103,47 @@ To uninstall the patch:
 
 
 
++---------------------+
+|    Release notes    |
++---------------------+
+
+v0.92 adds two fixes related to music.
+
+The first is forcing default MS MPEG codecs in Windows as these codecs are
+known to cause no problems. But if you experience problems and error messages,
+you can desactivate this fix by creating a file named "wkuup_settings.txt"
+in the game's directory and writing the following line:
+
+dshow_force_ms_mpeg_codecs 0
+
+The second is removing a useless wait when the game checks if the music has
+ended. The result is that the game gets higher FPS but also higher CPU usage.
+If you don't want a high CPU usage, then you can desactivate the fix by
+creating a file named "wkuup_settings.txt" in the game's directory and
+writing the following line:
+
+dshow_waitforcompletion_immediate 0
+
+
+
++--------------------------+
+|    Multiplayer notice    |
++--------------------------+
+
+  The patch can be used to play multiplayer games.
+
+  Persons using this patch may be able to play with others who don't have it.
+However this is not recommended because this could cause some problems.
+
+  If you aren't able to join multiplayer games, removing temporarily the patch
+is a potential fix.
+
+  If you want to play multiplayer games with mods and/or custom maps, then
+everyone must have the mod files installed. Also, this patch must also
+be installed by everyone if the mod(s) require it.
+
+
+
 +----------------+
 |    Settings    |
 +----------------+
@@ -105,8 +154,8 @@ enabled or disabled.
 To do this, create a new file named "wkuup_settings.txt" in the same directory
 as the game's executable.
 
-For every line you can specify the name of the setting you want to set and then
-a number: 0 to disable or 1 to enable.
+For each line, you type the name of the setting you want to set, followed
+by a number: 0 to disable or 1 to enable.
 
 For example, to enable tracing:
 enable_trace_action 1
@@ -115,25 +164,31 @@ When a setting is not specified in the file, it will take a default value.
 
 Here is a list of available settings and their default values:
 
-higher_time_precision           1
-custom_campaign_crash_fix       1
-use_data_directory              1
-use_multi_bcp                   1
-sight_range_events_bugfix       1
-setting_custom_multiplayer_maps 1
-no_tutorial_in_skirmish         1
-map_editor_button               1
-map_editor_hacks                1
-enable_trace_action             0
-enable_trace_value_action       0
-trace_filter                    0
-zero_allocated_memory           0
+higher_time_precision             1
+custom_campaign_crash_fix         1
+use_data_directory                1
+use_multi_bcp                     1
+sight_range_events_bugfix         1
+setting_custom_multiplayer_maps   1
+no_tutorial_in_skirmish           1
+map_editor_button                 1
+map_editor_hacks                  1
+dshow_force_ms_mpeg_codecs        1
+dshow_waitforcompletion_immediate 1
+show_all_screen_resolutions       1
+enable_trace_action               0
+enable_trace_value_action         0
+trace_filter                      0
+zero_allocated_memory             0
+dshow_no_default_syncsrc          0
 
 
 
 +---------------+
 |    Modding    |
 +---------------+
+
+[---- Data directory ----]
 
   The patch enables the "data" directory, which allows you to add and replace
 files without having to create BCP files.
@@ -149,6 +204,8 @@ gets the priority over it.
 
 
 
+[---- Campaigns ----]
+
   The first WK allows you to add a new campaign by adding a .CAM file in the
 "Campaigns" directory that you can find in "data\", "data.bcp", "saved", ...
 
@@ -160,6 +217,8 @@ fixes this issue.
 with the game to know how to write them.
 
 
+
+[---- Levels ----]
 
   The patch even allows you to put new maps to select in the skirmish or
 multiplayer screen.
@@ -175,6 +234,8 @@ The game determinates the number of players required by looking at
 NUM_HUMAN_PLAYERS at the beginning of the savegame.
 
 
+
+[---- Trace actions ----]
 
   The patch adds back the TRACE and TRACE_VALUE actions, but this feature is
 disabled by default. You can enable them in the settings file (see Settings

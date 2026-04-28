@@ -2,6 +2,15 @@
 
 #include "global.h"
 
+static naked void loc_442566()
+{
+	__asm push ecx  // IPin* of Source output
+	__asm push eax  // IGraphBuilder*
+	__asm call BuildMsMpegGraph
+	__asm mov ecx, 0x44256B
+	__asm jmp ecx
+}
+
 static void WriteNotification(wchar_t *txt)
 {
 	__asm {
@@ -195,6 +204,21 @@ void PatchStart_WKB()
 		SetImmediateJump((void*)0x41d260, (uint)loc_41d260);
 		SetImmediateJump((void*)0x41b07d, (uint)loc_41b07d);
 		SetImmediateJump((void*)0x41cfbc, (uint)loc_41cfbc);
+	}
+	// Force MS MPEG audio codecs to render music.
+	if(setting_dshow_force_ms_mpeg_codecs)
+		SetImmediateJump((void*)0x442566, (uint)loc_442566);
+	// Avoid call to IFilterGraph->SetDefaultSyncSource.
+	if(setting_dshow_no_default_syncsrc)
+		*(uchar*)0x442661 = 0xEB; // jz short -> jmp short
+	// Set first argument to 0 ms when calling IMediaEvent->WaitForCompletion.
+	if(setting_dshow_waitforcompletion_immediate)
+		*(char*)0x442876 = 0;
+	// Allow a wider range of screen resolution ratios.
+	if(setting_show_all_screen_resolutions)
+	{
+		*(float*)0x843D30 = 0.0f;	// Minimum ratio
+		*(float*)0x843D2C = 10.0f;	// Maximum ratio
 	}
 
 	// Make the IAT back to non-writable for security reasons.

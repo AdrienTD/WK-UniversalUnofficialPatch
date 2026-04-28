@@ -2,6 +2,15 @@
 
 #include "global.h"
 
+static naked void loc_58444e()
+{
+	__asm push ecx  // IPin* of Source output
+	__asm push eax  // IGraphBuilder*
+	__asm call BuildMsMpegGraph
+	__asm mov ecx, 0x584453
+	__asm jmp ecx
+}
+
 static naked void call_5d4ad6()
 {
 	__asm mov eax, [esp+12]
@@ -175,6 +184,15 @@ void PatchStart_WKO()
 		SetImmediateJump((void*)0x5cf297, (uint)loc_5cf297);
 		SetImmediateJump((void*)0x5cfc04, (uint)loc_5cfc04);
 	}
+	// Force MS MPEG audio codecs to render music.
+	if(setting_dshow_force_ms_mpeg_codecs)
+		SetImmediateJump((void*)0x58444e, (uint)loc_58444e);
+	// Avoid call to IFilterGraph->SetDefaultSyncSource.
+	if(setting_dshow_no_default_syncsrc)
+		*(uchar*)0x58446B = 0xEB; // jz short -> jmp short
+	// Set first argument to 0 ms when calling IMediaEvent->WaitForCompletion.
+	if(setting_dshow_waitforcompletion_immediate)
+		*(char*)0x584696 = 0;
 
 	// Make the IAT back to non-writable for security reasons.
 	SetMemProtection((void*)0x698000, PAGE_READONLY);
