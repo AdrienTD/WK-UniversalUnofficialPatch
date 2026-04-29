@@ -23,20 +23,20 @@ static void WriteNotification(wchar_t *txt)
 	}
 }
 
-static void __cdecl Action_Trace(char *this, void *arg)
+static void __cdecl Action_Trace(char *self, void *arg)
 {
-	wchar_t w[256]; uchar *s;
-	s = *(uchar**)(this+4);
+	wchar_t w[256]; char *s;
+	s = *(char**)(self+4);
 	if(setting_trace_filter) if(s[0] != '@') return;
 	atow(s, w, 255); w[255] = 0;
 	WriteNotification(w);
 }
 
-static void __cdecl Action_Trace_Value(char *this, void *arg)
+static void __cdecl Action_Trace_Value(char *self, void *arg)
 {
-	wchar_t w[256]; float f; void *v; uchar *s;
-	v = *(void**)(this+4);
-	s = *(uchar**)(this+8);
+	wchar_t w[256]; float f; void *v; char *s;
+	v = *(void**)(self+4);
+	s = *(char**)(self+8);
 	if(setting_trace_filter) if(s[0] != '@') return;
 
 	__asm push arg

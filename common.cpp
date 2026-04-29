@@ -2,6 +2,7 @@
 // By AdrienTD
 
 #include "global.h"
+#include <io.h>
 
 typedef void *(WINAPI *ftDirect3DCreate8)(int SDKVersion);
 
@@ -77,28 +78,28 @@ int __stdcall BuildMsMpegGraph(IGraphBuilder *gb, IPin *psrcout)
 	IBaseFilter *mss, *mad;
 	IPin *pmssin, *pmssout, *pmadin, *pmadout;
 
-	hr = CoCreateInstance(&CLSID_MPEG1Splitter, NULL, CLSCTX_INPROC_SERVER, &IID_IBaseFilter, (void**)&mss);
+	hr = CoCreateInstance(CLSID_MPEG1Splitter, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void**)&mss);
 	msmpegfail(1);
-	hr = CoCreateInstance(&CLSID_CMpegAudioCodec, NULL, CLSCTX_INPROC_SERVER, &IID_IBaseFilter, (void**)&mad);
+	hr = CoCreateInstance(CLSID_CMpegAudioCodec, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void**)&mad);
 	msmpegfail(2);
 
-	hr = gb->lpVtbl->AddFilter(gb, mss, L"WKUUP MPEG Stream Splitter"); msmpegfail(3);
-	hr = gb->lpVtbl->AddFilter(gb, mad, L"WKUUP MPEG Audio Decoder"); msmpegfail(4);
+	hr = gb->AddFilter(mss, L"WKUUP MPEG Stream Splitter"); msmpegfail(3);
+	hr = gb->AddFilter(mad, L"WKUUP MPEG Audio Decoder"); msmpegfail(4);
 
-	hr = mss->lpVtbl->FindPin(mss, L"Input", &pmssin);		msmpegfail(5);
-	hr = mad->lpVtbl->FindPin(mad, L"In", &pmadin);			msmpegfail(6);
-	hr = gb->lpVtbl->ConnectDirect(gb, psrcout, pmssin, NULL);	msmpegfail(7);
-	hr = mss->lpVtbl->FindPin(mss, L"Audio", &pmssout);		msmpegfail(8);
-	hr = gb->lpVtbl->ConnectDirect(gb, pmssout, pmadin, NULL);	msmpegfail(9);
-	hr = mad->lpVtbl->FindPin(mad, L"Out", &pmadout);		msmpegfail(10);
-	hr = gb->lpVtbl->Render(gb, pmadout);				msmpegfail(11);
+	hr = mss->FindPin(L"Input", &pmssin);		msmpegfail(5);
+	hr = mad->FindPin(L"In", &pmadin);			msmpegfail(6);
+	hr = gb->ConnectDirect(psrcout, pmssin, NULL);	msmpegfail(7);
+	hr = mss->FindPin(L"Audio", &pmssout);		msmpegfail(8);
+	hr = gb->ConnectDirect(pmssout, pmadin, NULL);	msmpegfail(9);
+	hr = mad->FindPin(L"Out", &pmadout);		msmpegfail(10);
+	hr = gb->Render(pmadout);				msmpegfail(11);
 
-	pmssin->lpVtbl->Release(pmssin);
-	pmssout->lpVtbl->Release(pmssout);
-	pmadin->lpVtbl->Release(pmadin);
-	pmadout->lpVtbl->Release(pmadout);
-	mss->lpVtbl->Release(mss);
-	mad->lpVtbl->Release(mad);
+	pmssin->Release();
+	pmssout->Release();
+	pmadin->Release();
+	pmadout->Release();
+	mss->Release();
+	mad->Release();
 
 	//MessageBox(0, "Success!", 0, 64);
 	//hr = -1; msmpegfail(1999);
@@ -113,21 +114,26 @@ void SetImmediateJump(void *p, uint j)
 
 void SetMemProtection(void *mem, int flags)
 {
-	MEMORY_BASIC_INFORMATION mbi; int unused;
+	MEMORY_BASIC_INFORMATION mbi; DWORD unused;
 	VirtualQuery(mem, &mbi, sizeof(mbi));
 	VirtualProtect(mem, mbi.RegionSize, (mbi.Protect&0xFFFFFF00) | flags, &unused);
 }
 
 int VerifyVersion()
 {
-	char mname[256]; uint vsize, unk, v; void *vpnt; VS_FIXEDFILEINFO *ffi;
+	char mname[256];
+	DWORD vsize, unk, v;
+	UINT unk2;
+	void *vpnt;
+	VS_FIXEDFILEINFO *ffi;
+	
 	GetModuleFileName(NULL, mname, 127);
 	vsize = GetFileVersionInfoSize(mname, &unk);
 	if(!vsize) return -1;
 	vpnt = (void*)malloc(vsize);
 	if(!vpnt) return -1;
 	if(!GetFileVersionInfo(mname, 0, vsize, vpnt)) return -1;
-	if(!VerQueryValue(vpnt, "\\", &ffi, &unk)) return -1;
+	if(!VerQueryValue(vpnt, "\\", (void**)&ffi, &unk2)) return -1;
 	if(!unk) return -1;
 	v = LOWORD(ffi->dwFileVersionLS);
 	battles = v <= 152;
