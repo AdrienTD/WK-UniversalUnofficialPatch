@@ -123,7 +123,7 @@ int VerifyVersion()
 {
 	char mname[256];
 	DWORD vsize, unk, v;
-	UINT unk2;
+	UINT valueOutSize;
 	void *vpnt;
 	VS_FIXEDFILEINFO *ffi;
 	
@@ -133,8 +133,8 @@ int VerifyVersion()
 	vpnt = (void*)malloc(vsize);
 	if(!vpnt) return -1;
 	if(!GetFileVersionInfo(mname, 0, vsize, vpnt)) return -1;
-	if(!VerQueryValue(vpnt, "\\", (void**)&ffi, &unk2)) return -1;
-	if(!unk) return -1;
+	if(!VerQueryValue(vpnt, "\\", (void**)&ffi, &valueOutSize)) return -1;
+	if(valueOutSize == 0) return -1;
 	v = LOWORD(ffi->dwFileVersionLS);
 	battles = v <= 152;
 	if((v != 152) && (v != 366))
