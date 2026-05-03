@@ -24,6 +24,9 @@ char setting_higher_time_precision = 1, setting_custom_campaign_crash_fix = 1,
 	setting_dshow_no_default_syncsrc = 0, setting_show_all_screen_resolutions = 1,
 	setting_dshow_waitforcompletion_immediate = 1;
 
+bool setting_ui_performance_improvements = true,
+	setting_ui_messagebox_double_text_render_fix = true;
+
 void atow(char *a, wchar_t *w, uint ms)
 {
 	uint i, l;
@@ -190,6 +193,10 @@ void ReadSettings()
 			setting_show_all_screen_resolutions = p;
 		else if(!stricmp(s, "dshow_waitforcompletion_immediate"))
 			setting_dshow_waitforcompletion_immediate = p;
+		else if(!stricmp(s, "ui_performance_improvements"))
+			setting_ui_performance_improvements = p;
+		else if(!stricmp(s, "ui_messagebox_double_text_render_fix"))
+			setting_ui_messagebox_double_text_render_fix = p;
 	}
 	fclose(f);
 }

@@ -30,6 +30,9 @@ extern char setting_higher_time_precision, setting_custom_campaign_crash_fix,
 	setting_dshow_no_default_syncsrc, setting_show_all_screen_resolutions,
 	setting_dshow_waitforcompletion_immediate;
 
+extern bool setting_ui_performance_improvements,
+            setting_ui_messagebox_double_text_render_fix;
+
 void atow(char *a, wchar_t *w, uint ms);
 DWORD WINAPI myGetTickCount(void);
 void SetImmediateJump(void *p, uint j);

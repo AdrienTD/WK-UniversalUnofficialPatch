@@ -163,6 +163,8 @@ tdnnz:		mov eax, 0x41cfc2
 	}
 }
 
+void PatchStart_WKB_UiPerformanceImprovements();
+
 void PatchStart_WKB()
 {
 	// Make the IAT writable.
@@ -172,7 +174,7 @@ void PatchStart_WKB()
 	if(setting_higher_time_precision)
 		*(void**)(0x838290) = (void*)myGetTickCount;
 	// Replace 'v' with 'a' in the version text of the main menu.
-	((wchar_t*)0x916ad0)[0] = 'a';
+	((wchar_t*)0x916ad0)[0] = 'X';
 	// This will enable the data directory.
 	if(setting_use_data_directory)
 		*(uchar*)(0x750903) = 0;
@@ -220,6 +222,8 @@ void PatchStart_WKB()
 		*(float*)0x843D30 = 0.0f;	// Minimum ratio
 		*(float*)0x843D2C = 10.0f;	// Maximum ratio
 	}
+
+	PatchStart_WKB_UiPerformanceImprovements();
 
 	// Make the IAT back to non-writable for security reasons.
 	SetMemProtection((void*)0x838000, PAGE_READONLY);
