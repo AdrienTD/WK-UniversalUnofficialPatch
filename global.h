@@ -36,8 +36,39 @@ extern bool setting_ui_performance_improvements,
 void atow(char *a, wchar_t *w, uint ms);
 DWORD WINAPI myGetTickCount(void);
 void SetImmediateJump(void *p, uint j);
-void SetMemProtection(void *mem, int flags);
 int __stdcall BuildMsMpegGraph(IGraphBuilder *gb, IPin *psrcout);
 
 void PatchStart_WKO();
 void PatchStart_WKB();
+
+class MemProtectionChange
+{
+public:
+	MemProtectionChange(void* address, DWORD protection) : newProtection(protection), applied(false) {
+		VirtualQuery(address, &memInfo, sizeof(memInfo));
+		apply();
+	}
+	~MemProtectionChange() {
+		restore();
+	}
+
+	void apply() {
+		if(!applied) {
+			VirtualProtect(memInfo.BaseAddress, memInfo.RegionSize, newProtection, &oldProtection);
+			applied = true;
+		}
+	}
+
+	void restore() {
+		if(applied) {
+			DWORD unused;
+			VirtualProtect(memInfo.BaseAddress, memInfo.RegionSize, oldProtection, &unused);
+			applied = false;
+		}
+	}
+private:
+	MEMORY_BASIC_INFORMATION memInfo;
+	DWORD newProtection;
+	DWORD oldProtection;
+	bool applied;
+};

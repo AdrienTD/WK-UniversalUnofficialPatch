@@ -115,13 +115,6 @@ void SetImmediateJump(void *p, uint j)
 	*(uint*)((char*)p+1) = j - ((uint)p + 5);
 }
 
-void SetMemProtection(void *mem, int flags)
-{
-	MEMORY_BASIC_INFORMATION mbi; DWORD unused;
-	VirtualQuery(mem, &mbi, sizeof(mbi));
-	VirtualProtect(mem, mbi.RegionSize, (mbi.Protect&0xFFFFFF00) | flags, &unused);
-}
-
 int VerifyVersion()
 {
 	char mname[256];
@@ -129,7 +122,7 @@ int VerifyVersion()
 	UINT valueOutSize;
 	void *vpnt;
 	VS_FIXEDFILEINFO *ffi;
-	
+
 	GetModuleFileName(NULL, mname, 127);
 	vsize = GetFileVersionInfoSize(mname, &unk);
 	if(!vsize) return -1;
@@ -209,6 +202,10 @@ void PatchStart()
 	// Read the settings file (wkuup_settings.txt).
 	ReadSettings();
 
+	// Make the .text section writable.
+	MemProtectionChange textSectionProtectionChange((void*)0x401000, PAGE_EXECUTE_READWRITE);
+	textSectionProtectionChange.apply();
+
 	if(!battles) PatchStart_WKO();
 	else PatchStart_WKB(); //MessageBox(0, "Battles!", title, 64);
 
@@ -216,7 +213,7 @@ void PatchStart()
 	memcpy(exeep, oldepcode, 5);
 
 	// Make the .text section back to non-writable for security reasons.
-	SetMemProtection((void*)0x401000, PAGE_EXECUTE_READ);
+	textSectionProtectionChange.restore();
 }
 
 naked void EntryPointInterception()
@@ -233,9 +230,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 	char *mz, *pe;
 	if(fdwReason == DLL_PROCESS_ATTACH)
 	{
-		// Make the .text section writable.
-		SetMemProtection((void*)0x401000, PAGE_EXECUTE_READWRITE);
-
 		// Find the entry point address in the PE header.
 		exehi = GetModuleHandle(0);
 		mz = (char*)exehi;
@@ -244,11 +238,19 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 		if(*(uint*)pe != 'EP') return FALSE;
 		exeep = (char*)( *(uint*)(pe+0x28) + *(uint*)(pe+0x34) );
 
+		// Make the .text section writable.
+		DWORD oldProtection;
+		VirtualProtect(exeep, 5, PAGE_EXECUTE_READWRITE, &oldProtection);
+
 		// Save the first 5 bytes of the entry point code.
 		memcpy(oldepcode, exeep, 5);
 
 		// Put a jump to our function at the beginning of the entry point code.
 		SetImmediateJump(exeep, (uint)EntryPointInterception);
+
+		// Put the .text section back to non-writable.
+		DWORD unused;
+		VirtualProtect(exeep, 5, oldProtection, &unused);
 	}
 	return TRUE;
 }

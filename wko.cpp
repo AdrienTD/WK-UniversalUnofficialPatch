@@ -151,7 +151,8 @@ naked void loc_5cfc04()
 void PatchStart_WKO()
 {
 	// Make the IAT writable.
-	SetMemProtection((void*)0x698000, PAGE_READWRITE);
+	MemProtectionChange iatChange((void*)0x698000, PAGE_READWRITE);
+	iatChange.apply();
 
 	// Fix the unit teleportation by replacing GetTickCount with our own function in the IAT.
 	if(setting_higher_time_precision)
@@ -195,5 +196,5 @@ void PatchStart_WKO()
 		*(char*)0x584696 = 0;
 
 	// Make the IAT back to non-writable for security reasons.
-	SetMemProtection((void*)0x698000, PAGE_READONLY);
+	iatChange.restore();
 }

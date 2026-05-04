@@ -168,7 +168,8 @@ void PatchStart_WKB_UiPerformanceImprovements();
 void PatchStart_WKB()
 {
 	// Make the IAT writable.
-	SetMemProtection((void*)0x838000, PAGE_READWRITE);
+	MemProtectionChange iatChange((void*)0x838000, PAGE_READWRITE);
+	iatChange.apply();
 
 	// Fix the unit teleportation by replacing GetTickCount with our own function in the IAT.
 	if(setting_higher_time_precision)
@@ -226,5 +227,5 @@ void PatchStart_WKB()
 	PatchStart_WKB_UiPerformanceImprovements();
 
 	// Make the IAT back to non-writable for security reasons.
-	SetMemProtection((void*)0x838000, PAGE_READONLY);
+	iatChange.restore();
 }
