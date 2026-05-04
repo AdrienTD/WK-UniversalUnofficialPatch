@@ -20,9 +20,9 @@ char setting_higher_time_precision = 1, setting_custom_campaign_crash_fix = 1,
 	setting_zero_allocated_memory = 0, setting_sight_range_events_bugfix = 1,
 	setting_custom_multiplayer_maps = 1, setting_trace_filter = 0,
 	setting_no_tutorial_in_skirmish = 1, setting_map_editor_button = 1,
-	setting_map_editor_hacks = 1, setting_dshow_force_ms_mpeg_codecs = 1,
-	setting_dshow_no_default_syncsrc = 0, setting_show_all_screen_resolutions = 1,
-	setting_dshow_waitforcompletion_immediate = 1;
+	setting_map_editor_hacks = 1, setting_show_all_screen_resolutions = 1,
+	setting_dshow_force_ms_mpeg_codecs = 1, setting_dshow_no_default_syncsrc = 0,
+	setting_dshow_waitforcompletion_immediate = 1, setting_dshow_no_bitrate_limit = 1;
 
 bool setting_ui_performance_improvements = true,
 	setting_ui_messagebox_double_text_render_fix = true;
@@ -178,14 +178,16 @@ void ReadSettings()
 			setting_map_editor_button = p;
 		else if(!stricmp(s, "map_editor_hacks"))
 			setting_map_editor_hacks = p;
+		else if(!stricmp(s, "show_all_screen_resolutions"))
+			setting_show_all_screen_resolutions = p;
 		else if(!stricmp(s, "dshow_force_ms_mpeg_codecs"))
 			setting_dshow_force_ms_mpeg_codecs = p;
 		else if(!stricmp(s, "dshow_no_default_syncsrc"))
 			setting_dshow_no_default_syncsrc = p;
-		else if(!stricmp(s, "show_all_screen_resolutions"))
-			setting_show_all_screen_resolutions = p;
 		else if(!stricmp(s, "dshow_waitforcompletion_immediate"))
 			setting_dshow_waitforcompletion_immediate = p;
+		else if(!stricmp(s, "dshow_no_bitrate_limit"))
+			setting_dshow_no_bitrate_limit = p;
 		else if(!stricmp(s, "ui_performance_improvements"))
 			setting_ui_performance_improvements = p;
 		else if(!stricmp(s, "ui_messagebox_double_text_render_fix"))

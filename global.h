@@ -26,9 +26,9 @@ extern char setting_higher_time_precision, setting_custom_campaign_crash_fix,
 	setting_zero_allocated_memory, setting_sight_range_events_bugfix,
 	setting_custom_multiplayer_maps, setting_trace_filter,
 	setting_no_tutorial_in_skirmish, setting_map_editor_button,
-	setting_map_editor_hacks, setting_dshow_force_ms_mpeg_codecs,
-	setting_dshow_no_default_syncsrc, setting_show_all_screen_resolutions,
-	setting_dshow_waitforcompletion_immediate;
+	setting_map_editor_hacks, setting_show_all_screen_resolutions,
+	setting_dshow_force_ms_mpeg_codecs, setting_dshow_no_default_syncsrc,
+	setting_dshow_waitforcompletion_immediate, setting_dshow_no_bitrate_limit;
 
 extern bool setting_ui_performance_improvements,
             setting_ui_messagebox_double_text_render_fix;

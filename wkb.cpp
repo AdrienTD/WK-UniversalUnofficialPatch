@@ -208,6 +208,7 @@ void PatchStart_WKB()
 		SetImmediateJump((void*)0x41b07d, (uint)loc_41b07d);
 		SetImmediateJump((void*)0x41cfbc, (uint)loc_41cfbc);
 	}
+
 	// Force MS MPEG audio codecs to render music.
 	if(setting_dshow_force_ms_mpeg_codecs)
 		SetImmediateJump((void*)0x442566, (uint)loc_442566);
@@ -217,6 +218,13 @@ void PatchStart_WKB()
 	// Set first argument to 0 ms when calling IMediaEvent->WaitForCompletion.
 	if(setting_dshow_waitforcompletion_immediate)
 		*(char*)0x442876 = 0;
+	// Remove music stream bitrate limit (set CMemReader::dwKBPerSec to INFINITE).
+	// This fixes the game freezing for seconds when changing music, depending on the codec, especially on Wine.
+	// WK1 already has it set to INFINITE, but WKB set it to 90 KB/s.
+	// See https://github.com/microsoft/Windows-classic-samples/blob/main/Samples/Win7Samples/multimedia/directshow/filters/async/memfile/memfile.h
+	if(setting_dshow_no_bitrate_limit)
+		*(DWORD*)0x4423E6 = INFINITE;
+
 	// Allow a wider range of screen resolution ratios.
 	if(setting_show_all_screen_resolutions)
 	{
