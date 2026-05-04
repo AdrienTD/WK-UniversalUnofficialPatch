@@ -19,7 +19,7 @@ char setting_higher_time_precision = 1, setting_custom_campaign_crash_fix = 1,
 	setting_enable_trace_action = 0, setting_enable_trace_value_action = 0,
 	setting_zero_allocated_memory = 0, setting_sight_range_events_bugfix = 1,
 	setting_custom_multiplayer_maps = 1, setting_trace_filter = 0,
-	setting_no_tutorial_in_skirmish = 1, setting_map_editor_button = 1,
+	setting_no_tutorial_in_skirmish = 1, setting_map_editor_button = 0,
 	setting_map_editor_hacks = 1, setting_show_all_screen_resolutions = 1,
 	setting_dshow_force_ms_mpeg_codecs = 1, setting_dshow_no_default_syncsrc = 0,
 	setting_dshow_waitforcompletion_immediate = 1, setting_dshow_no_bitrate_limit = 1;
