@@ -15,5 +15,5 @@ if "%1"=="debug" (
 if not exist out\ ( mkdir out )
 
 rc /DPATCHVER=%PATCH_VERSION_MAJOR%,%PATCH_VERSION_MINOR%,0,0 /Foout/resource.res resource.rc
-cl /c /Foout/ %PATCH_VERSION_DEFINES% %COMPILER_FLAGS% *.cpp
+cl /c /Foout/ /EHsc %PATCH_VERSION_DEFINES% %COMPILER_FLAGS% *.cpp
 link /DLL /DEF:d3d8.def /OUT:out/d3d8.dll /MAP %LINKER_FLAGS% out/*.obj out/resource.res user32.lib version.lib ole32.lib strmiids.lib
