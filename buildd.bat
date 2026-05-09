@@ -1,1 +1,1 @@
-@buildr /DDBGSTR
+@buildr debug

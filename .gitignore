@@ -4,3 +4,4 @@
 *.exp
 
 d3d8.dll
+out/
