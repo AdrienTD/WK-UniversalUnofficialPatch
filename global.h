@@ -16,6 +16,8 @@ typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
 
+extern const wchar_t* const g_uupVersionDisplay;
+
 extern char title[];
 extern char tbuf[512];
 extern char battles;

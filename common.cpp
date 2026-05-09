@@ -6,6 +6,13 @@
 
 typedef void *(WINAPI *ftDirect3DCreate8)(int SDKVersion);
 
+#define STRVER_WIDE_LITERAL2(x) L##x
+#define STRVER_WIDE_LITERAL(x) STRVER_WIDE_LITERAL2(x)
+#define STRVER_STRINGIFY2(x) #x
+#define STRVER_STRINGIFY(x) STRVER_STRINGIFY2(x)
+#define STRINGIFY_VERSION(a,b) STRVER_STRINGIFY(PATCH_VERSION_MAJOR) "." STRVER_STRINGIFY(PATCH_VERSION_MINOR)
+static const wchar_t* const g_uupVersionDisplay = L"UUP " STRVER_WIDE_LITERAL(STRINGIFY_VERSION(PATCH_VERSION_MAJOR, PATCH_VERSION_MINOR));
+
 char title[] = "WK Universal Unofficial Patch";
 HMODULE d3d8 = 0;
 ftDirect3DCreate8 oriDirect3DCreate8;

@@ -2,6 +2,8 @@
 
 #include "global.h"
 
+#include <initializer_list>
+
 static naked void loc_58444e()
 {
 	__asm push ecx  // IPin* of Source output
@@ -148,17 +150,50 @@ naked void loc_5cfc04()
 	}
 }
 
+naked void loc_5c802e_PatchVersionColor()
+{
+	__asm {
+		// replaced instruction
+		mov ecx, [ebx+0x104]
+
+		mov dword ptr [ecx+0x44], 0xFF00FF00
+
+		mov eax, 0x5c8034
+		jmp eax
+	}
+}
+
+void PatchVersionDisplay()
+{
+	// Game version text label coordinates
+	*(uchar*)0x5C7EA7 = 40; // left
+	*(uchar*)0x5C7EB6 = 50; // top
+	*(uchar*)0x5C7EC5 = 0; // right
+	*(uchar*)0x5C7ED4 = 30; // bottom
+
+	// UUP Patch version text label
+	// This reuses a second version label control that was left empty, how convenient!
+	for(uint addr : {0x5c7f50, 0x5c7f5b, 0x5c7f6b, 0x5c7f72, 0x5c7f7f, 0x5c7fe6})
+		*(const wchar_t**)addr = g_uupVersionDisplay;
+	*(uchar*)0x5C7FFB = 70; // left
+	*(uchar*)0x5C800A = 30; // top
+	*(uchar*)0x5C8019 = 0; // right
+	*(uchar*)0x5C8028 = 10; // bottom
+	SetImmediateJump((void*)0x5c802e, (uint)loc_5c802e_PatchVersionColor);
+}
+
 void PatchStart_WKO()
 {
 	// Make the IAT writable.
 	MemProtectionChange iatChange((void*)0x698000, PAGE_READWRITE);
 	iatChange.apply();
 
+	// Display UUP version in main menu.
+	PatchVersionDisplay();
+
 	// Fix the unit teleportation by replacing GetTickCount with our own function in the IAT.
 	if(setting_higher_time_precision)
 		*(void**)(0x698198) = (void*)myGetTickCount;
-	// Replace 'v' with 'a' in the version text of the main menu.
-	((wchar_t*)0x7151e8)[0] = 'a';
 	// This will fix the crash when opening a custom campaign.
 	if(setting_custom_campaign_crash_fix)
 		*(uint*)(0x5d4ad6) = (uint)call_5d4ad6 - 0x5d4ada;

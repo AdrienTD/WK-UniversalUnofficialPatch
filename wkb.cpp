@@ -163,6 +163,29 @@ tdnnz:		mov eax, 0x41cfc2
 	}
 }
 
+static naked void loc_771eed_AdditionalUUPVersionDisplay()
+{
+	__asm {
+		mov esi, [esp+4]
+		sub dword ptr [esp+4], 24 // move up a few pixels the original version text
+		mov eax, 0x77c390 // WKDrawOutlinedText
+		call eax
+
+		sub ebx, 32 // move left a few pixels the new text
+		mov dword ptr [esp+0x48+0x1C], 0x00FF00 // text color in the FontStyle object
+		push dword ptr g_uupVersionDisplay
+		push esi
+		push ebx
+		lea edx, [esp+0x54]
+		mov ecx, edi
+		mov eax, 0x77c390 // WKDrawOutlinedText
+		call eax
+
+		mov eax, 0x771ef2
+		jmp eax
+	}
+}
+
 void PatchStart_WKB_UiPerformanceImprovements();
 
 void PatchStart_WKB()
@@ -171,11 +194,12 @@ void PatchStart_WKB()
 	MemProtectionChange iatChange((void*)0x838000, PAGE_READWRITE);
 	iatChange.apply();
 
+	// Display UUP version in main menu.
+	SetImmediateJump((void*)0x771eed, (uint)loc_771eed_AdditionalUUPVersionDisplay);
+
 	// Fix the unit teleportation by replacing GetTickCount with our own function in the IAT.
 	if(setting_higher_time_precision)
 		*(void**)(0x838290) = (void*)myGetTickCount;
-	// Replace 'v' with 'a' in the version text of the main menu.
-	((wchar_t*)0x916ad0)[0] = 'X';
 	// This will enable the data directory.
 	if(setting_use_data_directory)
 		*(uchar*)(0x750903) = 0;
