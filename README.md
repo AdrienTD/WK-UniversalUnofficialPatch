@@ -2,6 +2,8 @@
 
 Patch for both Warrior Kings, and Warrior Kings - Battles, games developed by Black Cactus.
 
+[Download](https://github.com/AdrienTD/WK-UniversalUnofficialPatch/releases)
+
 ## Usage
 
 1. Download from the Releases (TODO).
