@@ -1,17 +1,61 @@
 WK Universal Unofficial Patch
-Version 0.92
+Version 0.94
 By AdrienTD
-
+https://github.com/AdrienTD/WK-UniversalUnofficialPatch
 
 
 This is an unofficial patch for Warrior Kings 1.4 (Build 366) and
 Warrior Kings - Battles v1.23 (Build 152) that fixes certain bugs and adds
 new features.
 
-It is a small d3d8.DLL file that, once loaded by the game, will patch the
-game's code in the RAM memory before the game gets launched. It redirects
-Direct3D calls to either "apd3d8.dll" if found in the executable directory,
-or the system's real d3d8.dll.
+It is a small "d3d8.dll" file that patches the game's code in memory right when
+the game launches.
+
+
+
++--------------------+
+|    Installation    |
++--------------------+
+
+   /!\ Please do NOT copy the patch DLL to system32.
+
+Definition:
+  The "game's directory" is where the folder/path where the game is installed,
+  where the game executable is (Warrior_Kings.exe).
+  Examples where the game could be found:
+    C:\Program Files (x86)\Microids\Warrior Kings
+    C:\Program Files (x86)\Empire Interactive\Warrior Kings Battles
+	C:\Program Files (x86)\Steam\steamapps\common\Warrior Kings (Battles)
+	C:\Program Files (x86)\GOG Galaxy\Games\Warrior Kings (Battles)
+
+To install the patch:
+
+ 1. If there is already a file named "d3d8.dll" in the game's directory
+    (for example you are using the ENB series or D3D8to9 converters, that you
+    might have needed to solve graphical problems), rename it to "apd3d8.dll".
+
+ 2. Copy the "d3d8.dll" from the patch archive into the game's directory.
+ 
+ If you use Linux/Wine:
+ 3. Run `winecfg`, go to the Libraries tab, add a DLL override to d3d8,
+    and set it to "Native then builtin", if this hasn't been done before.
+	For more info, see:
+	https://gitlab.winehq.org/wine/wine/-/wikis/Wine-User's-Guide#configuring-wine
+
+To verify if the installation went well, run the game. At the main menu, look
+at the version numbers in the right-bottom corner of the screen. If you see
+the letters "UUP" colored in green, then the patch is working.
+
+
++---------------------------+
+|    Uninstall the patch    |
++---------------------------+
+
+To uninstall the patch:
+
+ 1. Remove (or rename) "d3d8.dll" from the game's directory.
+
+ 2. If there is "apd3d8.dll", rename it back to "d3d8.dll".
 
 
 
@@ -21,28 +65,26 @@ or the system's real d3d8.dll.
 
 This patch contains:
 
- - Higher time precision, fixing the famous unit teleportation bug.
+ - Music bug fixes, including:
 
- - (WKO*) Bug where sight range events are sometimes not sent is now fixed.
+    - (WKBÂ²) Fix game freezing for seconds every time the music changes.
+      This happened when a MP2 codec other than the one provided by Microsoft
+      was being used.
+
+    - Improve game framerate when music is on.
+      In the first WK, the mission introduction cinematic with the narrator now
+      becomes significantly smoother, going from 16 FPS to 60 FPS!
+
+ - (WKO*) Bug where sight range events were not working properly is now fixed.
     -> Fixes watchtowers/forts sometimes not firing/alerting automatically.
-    -> Fixes bug where the barbarians won't come to you in the second celestial
-       level (the Rescue Tomas mission).
+    -> Fixes bug where the barbarians won't come to you in the Rescue Tomas
+       mission.
     -> Fixes lots of other bugs related to sight range.
 
- - [NEW!] Music bug fixes, including:
+ - Higher time precision, fixing the famous unit teleportation bug.
+   [NOTE: this may still not be fully fixed, especially on fast systems]
 
-    - Forcing the game to use the default MPEG audio decoder provided by
-      Windows, instead of using custom third-party codecs that can cause
-      bugs and other problems.
-
-    - The game has the tendency to wait some milliseconds doing nothing else
-      to determinate if the music has stopped or not, which can have an impact
-      on performance. The patch will remove this wait, making the game
-      smoother. In the first WK, the mission introduction cinematic with the
-      narrator now becomes significantly smoother, going from 16 FPS to
-      60 FPS!
-
- - [NEW!] (WKB²) Widescreen resolutions are now available in the graphics
+ - (WKBÂ²) Widescreen resolutions are now available in the graphics
    options screen.
 
  - Modding abilities, including:
@@ -60,46 +102,13 @@ This patch contains:
 
     - You can add maps in the multiplayer/skirmish map list.
 
-    - (WKB²) Map editor enabled, with some bug fixes.
+    - (WKBÂ²) The unused and unfinished in-game Map editor can be enabled,
+      with some bug fixes.
 
- - Optional features:
-
-   - Enable the TRACE and/or TRACE_VALUE actions.
-
-   - (WKO*) Full memory with 0 after allocation.
+    - Enable the TRACE and/or TRACE_VALUE actions.
 
 * only for the first Warrior Kings
-² only for Warrior Kings - Battles
-
-
-
-+--------------------+
-|    Installation    |
-+--------------------+
-
-   /!\ Please do NOT copy the patch DLL to system32.
-
-Definition:
-  The "game's directory" is where there is the executable (exe) of the game.
-
-To install the patch:
-
- 1. If there is already a file named "d3d8.dll" in the game's directory
-    (for example you are using the ENB series/converters, that you might have
-    needed to solve graphical problems), rename it to "apd3d8.dll".
-
- 2. Copy the "d3d8.dll" from the patch archive into the game's directory.
-
-To verify if the installation went well, run the game. At the main menu, look
-at the version numbers in the right-bottom corner of the screen. If the first
-letter is an 'a', then that means that the patch is working. In Battles you
-might also notice the Map Editor button under the Exit button.
-
-To uninstall the patch:
-
- 1. Remove (or rename) "d3d8.dll" from the game's directory.
-
- 2. If there is "apd3d8.dll", rename it back to "d3d8.dll".
+Â² only for Warrior Kings - Battles
 
 
 
@@ -107,22 +116,60 @@ To uninstall the patch:
 |    Release notes    |
 +---------------------+
 
-v0.92 adds two fixes related to music.
+## v0.94
 
-The first is forcing default MS MPEG codecs in Windows as these codecs are
-known to cause no problems. But if you experience problems and error messages,
-you can desactivate this fix by creating a file named "wkuup_settings.txt"
-in the game's directory and writing the following line:
+* Fix patch compatibility with Wine.
+  Previously, when using the patch on Wine, the game would crash at launch.
 
-dshow_force_ms_mpeg_codecs 0
+* WKB Fix music freeze issue that was still present on Wine (as there is no
+  Microsoft MPEG codec).
+  In theory this should also fix the issue on Windows when using a MPEG codec
+  other than Microsoft's one.
 
-The second is removing a useless wait when the game checks if the music has
-ended. The result is that the game gets higher FPS but also higher CPU usage.
-If you don't want a high CPU usage, then you can desactivate the fix by
-creating a file named "wkuup_settings.txt" in the game's directory and
-writing the following line:
+* The WKB Map editor button is now disabled by default.
+  It is highly recommended to use the alternative map editor "wkbre" instead.
+  See https://github.com/AdrienTD/wkbre
+  Or its fork https://github.com/kbhau/wkbre
+  If you still need it, enable it back in "wkuup_settings.txt" with:
 
-dshow_waitforcompletion_immediate 0
+  map_editor_button 1
+
+* The version of the patch is now displayed in the main menu, below the
+  game's version, in green.
+
+* WKB Fix a bug that renders text of message boxes two times. This can help
+  reduce lags in the Campaign province descriptions a little bit.
+
+* WKB UI Performance improvements (experimental)
+  The patch contains some rewritten parts of UI rendering code to improve the
+  framerate.
+  This is especially noticeable in places where there is too much text, like
+  the AI general description, Campaign province description, and the Load Game
+  menu.
+  These improvements are disabled by default (due to bugs with some drivers),
+  and must be enabled manually through "wkuup_settings.txt" by adding this line:
+
+  ui_performance_improvements 1
+
+
+## v0.92
+
+Adds two fixes related to music:
+
+* The first is forcing default MS MPEG codecs in Windows as these codecs are
+  known to cause no problems. But if you experience problems and error messages,
+  you can desactivate this fix by creating a file named "wkuup_settings.txt"
+  in the game's directory and writing the following line:
+
+  dshow_force_ms_mpeg_codecs 0
+
+* The second is removing a useless wait when the game checks if the music has
+  ended. The result is that the game gets higher FPS but also higher CPU usage.
+  If you don't want a high CPU usage, then you can desactivate the fix by
+  creating a file named "wkuup_settings.txt" in the game's directory and
+  writing the following line:
+
+  dshow_waitforcompletion_immediate 0
 
 
 
@@ -132,7 +179,7 @@ dshow_waitforcompletion_immediate 0
 
   The patch can be used to play multiplayer games.
 
-  Persons using this patch may be able to play with others who don't have it.
+  Players using this patch may be able to play with others who don't have it.
 However this is not recommended because this could cause some problems.
 
   If you aren't able to join multiplayer games, removing temporarily the patch
@@ -164,23 +211,26 @@ When a setting is not specified in the file, it will take a default value.
 
 Here is a list of available settings and their default values:
 
-higher_time_precision             1
-custom_campaign_crash_fix         1
-use_data_directory                1
-use_multi_bcp                     1
-sight_range_events_bugfix         1
-setting_custom_multiplayer_maps   1
-no_tutorial_in_skirmish           1
-map_editor_button                 1
-map_editor_hacks                  1
-dshow_force_ms_mpeg_codecs        1
-dshow_waitforcompletion_immediate 1
-show_all_screen_resolutions       1
-enable_trace_action               0
-enable_trace_value_action         0
-trace_filter                      0
-zero_allocated_memory             0
-dshow_no_default_syncsrc          0
+custom_campaign_crash_fix            1
+custom_multiplayer_maps              1
+dshow_force_ms_mpeg_codecs           1
+dshow_no_bitrate_limit               1
+dshow_no_default_syncsrc             0
+dshow_waitforcompletion_immediate    1
+enable_trace_action                  0
+enable_trace_value_action            0
+higher_time_precision                1
+map_editor_button                    0
+map_editor_hacks                     1
+no_tutorial_in_skirmish              1
+show_all_screen_resolutions          1
+sight_range_events_bugfix            1
+trace_filter                         0
+ui_messagebox_double_text_render_fix 1
+ui_performance_improvements          0
+use_data_directory                   1
+use_multi_bcp                        1
+zero_allocated_memory                0
 
 
 
@@ -230,7 +280,7 @@ To do this, your level savegame must follow these requirements:
  - (For the first WK only,) GAME_SET must be set to:
      "Warrior Kings Game Set\multi-player extensions.cpp"
 
-The game determinates the number of players required by looking at
+The game determines the number of players required by looking at
 NUM_HUMAN_PLAYERS at the beginning of the savegame.
 
 
@@ -242,23 +292,35 @@ disabled by default. You can enable them in the settings file (see Settings
 section of this document). The tracing will be printed as in-game messages.
 
   If you enable the "trace_filter" setting, then only trace messages that
-begin with the @ character will be printed, thus disabling the already included
-trace actions that you might not want.
+begin with the @ character will be printed, thus disabling the trace actions
+that the developers left in the original gameset, that you might not want.
 
 
 
-+------------------+
-|    Map Editor    |
-+------------------+
++----------------------------+
+|    WKBattles Map Editor    |
++----------------------------+
 
-  The patch also enables the map editor, that you can access from the main
-menu via the "Map Editor" button.
+  The patch also enables an unfinished map editor that was left in WKB,
+that you can access from the main menu via the "Map Editor" button, but
+this button is hidden by default.
 
-  But first, be sure that the "data" directory (in the same directory as the
+  Note that this editor is incomplete: it can only edit terrains, it is not
+possible to add units and objects. There are also a lot of bugs. The developers
+were not able to finish it for public use.
+
+  If you want to make your own maps, please check alternative tools.
+"wkbre" is a map editor that allows you to edit terrain and place objects at
+the same time, and is much more usable. See https://github.com/AdrienTD/wkbre
+Or check this fork with additional features and improvements:
+https://github.com/kbhau/wkbre
+
+  To make the "Map Editor" button appear in the main menu, you have to enable it
+in the patch's settings file (see Settings section of this document).
+
+  Then, be sure that the "data" directory (in the same directory as the
 game EXE) is created before using the map editor. It is used to load and save
 map files.
-
-
 
   If you run the map editor for the first time, you might notice certain
 error messages of type:
@@ -313,13 +375,3 @@ you are using ("WKO" for the first WK, "WKB" for WK - Battles).
 
   Now you should be able to find the map in the multiplayer/skirmish map list.
 
-
-
-----------------------------------------------------------------
-
-If you have problems or questions, you can contact me.
-Email: /
-Steam: /
-
-Enjoy! :D
-AdrienTD
