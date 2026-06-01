@@ -186,6 +186,31 @@ static naked void loc_771eed_AdditionalUUPVersionDisplay()
 	}
 }
 
+const char messageMultipleInstances[] = "The game is already running.\n\nAnother instance of the game will launch.";
+naked void loc_6BA875_AllowMultipleInstances()
+{
+	__asm {
+		cmp eax, ERROR_ALREADY_EXISTS
+		jz mutexExists
+	runGame:
+		mov eax, 0x6BA87B
+		jmp eax
+
+	mutexExists:
+		push MB_OKCANCEL
+		push offset title
+		push offset messageMultipleInstances
+		push 0
+		call MessageBoxA
+
+		cmp eax, IDOK
+		jz runGame
+
+		mov eax, 0x6BAE47
+		jmp eax
+	}
+}
+
 void PatchStart_WKB_UiPerformanceImprovements();
 
 void PatchStart_WKB()
@@ -255,6 +280,10 @@ void PatchStart_WKB()
 		*(float*)0x843D30 = 0.0f;	// Minimum ratio
 		*(float*)0x843D2C = 10.0f;	// Maximum ratio
 	}
+
+	// Allow multiple instances of the game running
+	if(setting_allow_multiple_instances)
+		SetImmediateJump((void*)0x6BA875, (uint)loc_6BA875_AllowMultipleInstances);
 
 	PatchStart_WKB_UiPerformanceImprovements();
 

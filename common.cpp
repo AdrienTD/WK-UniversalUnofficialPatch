@@ -29,7 +29,8 @@ char setting_higher_time_precision = 1, setting_custom_campaign_crash_fix = 1,
 	setting_no_tutorial_in_skirmish = 1, setting_map_editor_button = 0,
 	setting_map_editor_hacks = 1, setting_show_all_screen_resolutions = 1,
 	setting_dshow_force_ms_mpeg_codecs = 1, setting_dshow_no_default_syncsrc = 0,
-	setting_dshow_waitforcompletion_immediate = 1, setting_dshow_no_bitrate_limit = 1;
+	setting_dshow_waitforcompletion_immediate = 1, setting_dshow_no_bitrate_limit = 1,
+	setting_allow_multiple_instances = 0;
 
 bool setting_ui_performance_improvements = false,
 	setting_ui_messagebox_double_text_render_fix = true;
@@ -195,6 +196,8 @@ void ReadSettings()
 			setting_dshow_waitforcompletion_immediate = p;
 		else if(!stricmp(s, "dshow_no_bitrate_limit"))
 			setting_dshow_no_bitrate_limit = p;
+		else if(!stricmp(s, "allow_multiple_instances"))
+			setting_allow_multiple_instances = p;
 		else if(!stricmp(s, "ui_performance_improvements"))
 			setting_ui_performance_improvements = p;
 		else if(!stricmp(s, "ui_messagebox_double_text_render_fix"))
