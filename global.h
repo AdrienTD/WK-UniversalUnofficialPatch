@@ -31,7 +31,7 @@ extern char setting_higher_time_precision, setting_custom_campaign_crash_fix,
 	setting_map_editor_hacks, setting_show_all_screen_resolutions,
 	setting_dshow_force_ms_mpeg_codecs, setting_dshow_no_default_syncsrc,
 	setting_dshow_waitforcompletion_immediate, setting_dshow_no_bitrate_limit,
-	setting_allow_multiple_instances;
+	setting_allow_multiple_instances, setting_apply_bcm_sky_texture_and_fog_color;
 
 extern bool setting_ui_performance_improvements,
             setting_ui_messagebox_double_text_render_fix;

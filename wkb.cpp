@@ -211,6 +211,32 @@ naked void loc_6BA875_AllowMultipleInstances()
 	}
 }
 
+naked void loc_41CF04_ApplySkyColorAndTextureFromBCM()
+{
+	__asm {
+		// replaced instruction
+		rep movsb
+
+		// Pretty much what happens in the SNR loading code:
+
+		// ecx <- pointer to Private_rendering_interface singleton instance
+		mov eax, 0x920888
+		mov ecx, [eax]
+		// Call Private_rendering_interface::GetDriver()
+		mov eax, 0x5C42F0
+		call eax
+		// Call virtual Private_rendering_interface::SetSkyColor(color)
+		mov ecx, eax
+		push dword ptr [ebp+0x40]
+		mov edx, [ecx]
+		call dword ptr [edx+0xB0]
+
+		// we skip the code that overrides the skybox texture path
+		mov eax, 0x41CF1A
+		jmp eax
+	}
+}
+
 void PatchStart_WKB_UiPerformanceImprovements();
 
 void PatchStart_WKB()
@@ -284,6 +310,10 @@ void PatchStart_WKB()
 	// Allow multiple instances of the game running
 	if(setting_allow_multiple_instances)
 		SetImmediateJump((void*)0x6BA875, (uint)loc_6BA875_AllowMultipleInstances);
+
+	// Avoid BCM sky box file path and fog color from being overidden/ignored.
+	if(setting_apply_bcm_sky_texture_and_fog_color)
+		SetImmediateJump((void*)0x41CF04, (uint)loc_41CF04_ApplySkyColorAndTextureFromBCM);
 
 	PatchStart_WKB_UiPerformanceImprovements();
 
