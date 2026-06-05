@@ -2,6 +2,8 @@
 
 #include "global.h"
 
+#include <string>
+
 /////
 
 class File
@@ -260,12 +262,46 @@ naked void loc_6BA875_AllowMultipleInstances()
 	}
 }
 
+bool __stdcall IsCustomMap(const char* mapPath)
+{
+	size_t mapPathLength = strlen(mapPath);
+	std::wstring wMapPath(mapPathLength, 0);
+	for(size_t i = 0; i < mapPathLength; ++i)
+		wMapPath[i] = (wchar_t)mapPath[i];
+
+	Random_access_file file;
+	bool opened = file.Open(wMapPath.c_str(), 0);
+	if(!opened) return false;
+
+	FILETIME fileTime;
+	file.GetTime(&fileTime);
+
+	return fileTime.dwHighDateTime >= 0x01C5'0000 // after 21st Jan 2005
+		|| (fileTime.dwHighDateTime == 0 && fileTime.dwLowDateTime == 0); // maps exported by wkbre have date set to null (lazy Adrien)
+}
+
 naked void loc_41CF04_ApplySkyColorAndTextureFromBCM()
 {
 	__asm {
-		// replaced instruction
-		rep movsb
+		rep movsb // replaced instruction
+		pushad // don't forget to pop this!
 
+		lea eax, [ebp+0x368]
+		push eax
+		call IsCustomMap
+		mov bl, al
+
+		test al, al
+		jz useDefaultBcmFogColor
+
+useBcmFogColor:
+		mov esi, [ebp+0x40]
+		jmp applySky
+
+useDefaultBcmFogColor:
+		mov esi, 0x9fc5e6
+
+applySky:
 		// Pretty much what happens in the SNR loading code:
 
 		// ecx <- pointer to Private_rendering_interface singleton instance
@@ -276,13 +312,24 @@ naked void loc_41CF04_ApplySkyColorAndTextureFromBCM()
 		call eax
 		// Call virtual Private_rendering_interface::SetSkyColor(color)
 		mov ecx, eax
-		push dword ptr [ebp+0x40]
+		push esi // the fog color
 		mov edx, [ecx]
 		call dword ptr [edx+0xB0]
 
+		test bl, bl
+		jz useDefaultSkyBox
+
+useBcmSkyBox:
 		// we skip the code that overrides the skybox texture path
+		popad
 		mov eax, 0x41CF1A
 		jmp eax
+
+useDefaultSkyBox:
+		popad
+		add ebp, 0x17A0 // replaced instruction
+		mov edx, 0x41CF0C
+		jmp edx
 	}
 }
 
