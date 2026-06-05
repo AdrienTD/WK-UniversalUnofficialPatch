@@ -288,6 +288,46 @@ naked void loc_41CF04_ApplySkyColorAndTextureFromBCM()
 
 void PatchStart_WKB_UiPerformanceImprovements();
 
+bool __stdcall VerifyPatch1_1Data()
+{
+	Random_access_file file;
+	bool ok = file.Open(L"Warrior Kings Game Set\\Feature Tests.cpp", 0);
+	if(!ok) {
+		return true;
+	}
+
+	if(file.GetFileSize() == 155371)
+	{
+		int button = MessageBoxA(nullptr,
+			"v1.0 data detected!\n\n"
+			"New game data have been introduced since Version 1.1, but they are currently missing.\n\n"
+			"Please install the patch 1.1 data, particularly the file \"patch_1_1.bcp\", and keep the v1.23 executable.\n\n"
+			"You can continue, but without the patch 1.1 data, you will get the following issues:\n"
+			" - Some bugs and unbalances from v1.0 will still be present, even with a v1.23 exe. (For example, monks can be converted to peasants, etc.)\n"
+			" - You may also not be able to join multiplayer games.",
+			title, MB_ICONWARNING | MB_OKCANCEL);
+		return button == IDOK;
+	}
+
+	return true;
+}
+
+naked void loc_6BA7FF_VerifyForPatch1_1Data()
+{
+	__asm {
+		call VerifyPatch1_1Data
+		test al, al
+		jz patchMissing
+	patchPresent:
+		push 0xD0 // replaced instruction
+		mov eax, 0x6BA804
+		jmp eax
+	patchMissing:
+		mov eax, 0x6BAE4E
+		jmp eax
+	}
+}
+
 void PatchStart_WKB()
 {
 	// Make the IAT writable.
@@ -372,6 +412,8 @@ void PatchStart_WKB()
 	// Avoid BCM sky box file path and fog color from being overidden/ignored.
 	if(setting_apply_bcm_sky_texture_and_fog_color)
 		SetImmediateJump((void*)0x41CF04, (uint)loc_41CF04_ApplySkyColorAndTextureFromBCM);
+
+	SetImmediateJump((void*)0x6BA7FF, (uint)loc_6BA7FF_VerifyForPatch1_1Data);
 
 	PatchStart_WKB_UiPerformanceImprovements();
 
