@@ -2,6 +2,55 @@
 
 #include "global.h"
 
+/////
+
+class File
+{
+public:
+	virtual ~File();
+	virtual uint GetSize();
+	virtual uint Checksum();
+	virtual bool GetTime(FILETIME* outTime);
+	virtual void SetTime(const FILETIME* time);
+	virtual bool Seek(uint offset);
+	virtual bool Read(uint numBytes);
+private:
+	File() = delete;
+};
+
+class Random_access_file;
+
+void* (__cdecl *wkFuncPtr_newOperator)(size_t len);
+void (__cdecl *wkFuncPtr_deleteOperator)(void* ptr);
+void (__thiscall *wkFuncPtr_Random_access_file_Constructor)(Random_access_file* self);
+void (__thiscall *wkFuncPtr_Random_access_file_Destructor)(Random_access_file* self);
+bool (__thiscall *wkFuncPtr_Random_access_file_Open)(Random_access_file* self, const wchar_t* filePath, int mode);
+int (__thiscall *wkFuncPtr_Random_access_file_GetSize)(Random_access_file* self);
+void (__thiscall *wkFuncPtr_Random_access_file_Read)(Random_access_file* self, void* buffer, int size1, int size2);
+
+class Random_access_file
+{
+public:
+	void* operator new(size_t len) { return wkFuncPtr_newOperator(len); }
+	void operator delete(void* ptr) { wkFuncPtr_deleteOperator(ptr); }
+
+	Random_access_file() { wkFuncPtr_Random_access_file_Constructor(this); }
+
+	virtual ~Random_access_file() { wkFuncPtr_Random_access_file_Destructor(this); }
+
+	bool Open(const wchar_t* filePath, int mode) { return wkFuncPtr_Random_access_file_Open(this, filePath, mode); }
+	int GetFileSize() { return wkFuncPtr_Random_access_file_GetSize(this); }
+	void Read(void* buffer, int size1, int size2) { return wkFuncPtr_Random_access_file_Read(this, buffer, size1, size2); }
+
+	void GetTime(FILETIME* outTime) { file->GetTime(outTime); }
+
+private:
+	char data[12];
+	File* file;
+};
+
+/////
+
 static naked void loc_442566()
 {
 	__asm push ecx  // IPin* of Source output
@@ -244,6 +293,15 @@ void PatchStart_WKB()
 	// Make the IAT writable.
 	MemProtectionChange iatChange((void*)0x838000, PAGE_READWRITE);
 	iatChange.apply();
+
+	// Initialize function pointers
+	*(size_t*)&wkFuncPtr_newOperator = 0x7D7F57;
+	*(size_t*)&wkFuncPtr_deleteOperator = 0x7D4E5E;
+	*(size_t*)&wkFuncPtr_Random_access_file_Constructor = 0x7525a0;
+	*(size_t*)&wkFuncPtr_Random_access_file_Destructor = 0x752600;
+	*(size_t*)&wkFuncPtr_Random_access_file_Open = 0x7524E0;
+	*(size_t*)&wkFuncPtr_Random_access_file_GetSize = 0x4BE960;
+	*(size_t*)&wkFuncPtr_Random_access_file_Read = 0x7523B0;
 
 	// Display UUP version in main menu.
 	SetImmediateJump((void*)0x771eed, (uint)loc_771eed_AdditionalUUPVersionDisplay);
