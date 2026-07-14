@@ -388,6 +388,8 @@ float uiOutlinePosChanges[8] = {
 };
 uint uiOutlineColorChanges[4] = {0, 0, 0, 0xFFFFFFFF};
 
+void __cdecl sub_WKDrawText2_WithoutFormatting_WKB(void* interface2d, void* fontStyle, int pos_x, int pos_y, const wchar_t* text);
+
 static naked void loc_77c435_Outlined_Text_Optim()
 {
 	__asm {
@@ -405,8 +407,9 @@ static naked void loc_77c435_Outlined_Text_Optim()
 		lea     ecx, [esp+44h]
 		push    ecx             ; int
 		push    edx             ; int
-		mov     eax, 0x5C5E70
-		call    eax  // WKDrawText2
+		//mov     eax, 0x5C5E70
+		//call    eax  // WKDrawText2
+		call sub_WKDrawText2_WithoutFormatting_WKB
 		add     esp, 14h
 
 		mov edi, 0

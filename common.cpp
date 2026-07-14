@@ -123,6 +123,17 @@ void SetImmediateJump(void *p, uint j)
 	*(uint*)((char*)p+1) = j - ((uint)p + 5);
 }
 
+void SetImmediateCall(void *p, uint j)
+{
+	*(char*)p = 0xE8;
+	*(uint*)((char*)p+1) = j - ((uint)p + 5);
+}
+
+void NopifyCode(void* p, uint count)
+{
+	memset(p, 0x90, count);
+}
+
 int VerifyVersion()
 {
 	char mname[256];

@@ -1,6 +1,7 @@
 // Global header file
 
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <windows.h>
 #include <stdio.h>
 #include <dshow.h>
@@ -38,7 +39,11 @@ extern bool setting_ui_performance_improvements,
 
 void atow(char *a, wchar_t *w, uint ms);
 DWORD WINAPI myGetTickCount(void);
+
 void SetImmediateJump(void *p, uint j);
+void SetImmediateCall(void *p, uint j);
+void NopifyCode(void* p, uint count);
+
 int __stdcall BuildMsMpegGraph(IGraphBuilder *gb, IPin *psrcout);
 
 void PatchStart_WKO();

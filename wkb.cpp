@@ -333,8 +333,6 @@ useDefaultSkyBox:
 	}
 }
 
-void PatchStart_WKB_UiPerformanceImprovements();
-
 bool __stdcall VerifyPatch1_1Data()
 {
 	Random_access_file file;
@@ -374,6 +372,9 @@ naked void loc_6BA7FF_VerifyForPatch1_1Data()
 		jmp eax
 	}
 }
+
+void PatchStart_WKB_UiPerformanceImprovements();
+void PatchStart_WKB_DrawTextFixes();
 
 void PatchStart_WKB()
 {
@@ -463,6 +464,7 @@ void PatchStart_WKB()
 	SetImmediateJump((void*)0x6BA7FF, (uint)loc_6BA7FF_VerifyForPatch1_1Data);
 
 	PatchStart_WKB_UiPerformanceImprovements();
+	PatchStart_WKB_DrawTextFixes();
 
 	// Make the IAT back to non-writable for security reasons.
 	iatChange.restore();

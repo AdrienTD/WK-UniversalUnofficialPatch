@@ -182,6 +182,8 @@ void PatchVersionDisplay()
 	SetImmediateJump((void*)0x5c802e, (uint)loc_5c802e_PatchVersionColor);
 }
 
+void PatchStart_WKO_DrawTextFixes();
+
 void PatchStart_WKO()
 {
 	// Make the IAT writable.
@@ -229,6 +231,8 @@ void PatchStart_WKO()
 	// Set first argument to 0 ms when calling IMediaEvent->WaitForCompletion.
 	if(setting_dshow_waitforcompletion_immediate)
 		*(char*)0x584696 = 0;
+
+	PatchStart_WKO_DrawTextFixes();
 
 	// Make the IAT back to non-writable for security reasons.
 	iatChange.restore();
