@@ -13,14 +13,14 @@ typedef void *(WINAPI *ftDirect3DCreate8)(int SDKVersion);
 #define STRVER_STRINGIFY(x) STRVER_STRINGIFY2(x)
 #define STRINGIFY_VERSION(a,b) STRVER_STRINGIFY(PATCH_VERSION_MAJOR) "." STRVER_STRINGIFY(PATCH_VERSION_MINOR)
 static const wchar_t* const g_uupVersionDisplay = L"UUP " STRVER_WIDE_LITERAL(STRINGIFY_VERSION(PATCH_VERSION_MAJOR, PATCH_VERSION_MINOR));
+static const wchar_t* const g_title = L"WK Universal Unofficial Patch";
 
-static const wchar_t* const title = L"WK Universal Unofficial Patch";
+bool g_isBattles;
+
 HMODULE d3d8 = 0;
 ftDirect3DCreate8 oriDirect3DCreate8;
 char *exeep, oldepcode[5];
 HINSTANCE exehi;
-char tbuf[512];
-char battles;
 
 char setting_higher_time_precision = 1, setting_custom_campaign_crash_fix = 1,
 	setting_use_data_directory = 1,	setting_use_multi_bcp = 1,
@@ -78,7 +78,7 @@ void msmpegfailedmsg(int x)
 {
 	wchar_t b[256];
 	swprintf_s(b, L"Failed to build graph with only MS MPEG codecs!\nReason: %i\nPlease tell me about this problem! Thanks!", x);
-	MessageBoxW(0, b, title, 16);
+	MessageBoxW(0, b, g_title, 16);
 	ExitProcess(-1);
 }
 
@@ -150,11 +150,11 @@ int VerifyVersion()
 	if(!VerQueryValueW(vpnt, L"\\", (void**)&ffi, &valueOutSize)) return -1;
 	if(valueOutSize == 0) return -1;
 	v = LOWORD(ffi->dwFileVersionLS);
-	battles = v <= 152;
+	g_isBattles = v <= 152;
 	if((v != 152) && (v != 366))
 	{
-		swprintf_s(mname, L"You are using WK%s Build %u.\nBut this patch only works on:\n - WK v1.4 (Build 366)\n - WK - Battles v1.23 (Build 152)\nYou can continue, but the game will still not be patched.", battles ? L" - Battles" : L"", v);
-		if(MessageBoxW(0, mname, title, MB_ICONERROR | MB_OKCANCEL) != IDOK)
+		swprintf_s(mname, L"You are using WK%s Build %u.\nBut this patch only works on:\n - WK v1.4 (Build 366)\n - WK - Battles v1.23 (Build 152)\nYou can continue, but the game will still not be patched.", g_isBattles ? L" - Battles" : L"", v);
+		if(MessageBoxW(0, mname, g_title, MB_ICONERROR | MB_OKCANCEL) != IDOK)
 			ExitProcess('UUP0');
 	}
 	return 1;
@@ -230,7 +230,7 @@ void PatchStart()
 	MemProtectionChange textSectionProtectionChange((void*)0x401000, PAGE_EXECUTE_READWRITE);
 	textSectionProtectionChange.apply();
 
-	if(!battles) PatchStart_WKO();
+	if(!g_isBattles) PatchStart_WKO();
 	else PatchStart_WKB();
 
 	// Restore entry point code.

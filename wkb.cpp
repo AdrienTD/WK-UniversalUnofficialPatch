@@ -249,7 +249,7 @@ naked void loc_6BA875_AllowMultipleInstances()
 
 	mutexExists:
 		push MB_OKCANCEL
-		push offset title
+		push offset g_title
 		push offset messageMultipleInstances
 		push 0
 		call MessageBoxW
@@ -350,7 +350,7 @@ bool __stdcall VerifyPatch1_1Data()
 			L"You can continue, but without the patch 1.1 data, you will get the following issues:\n"
 			L" - Some bugs and unbalances from v1.0 will still be present, even with a v1.23 exe. (For example, monks can be converted to peasants, etc.)\n"
 			L" - You may also not be able to join multiplayer games.",
-			title, MB_ICONWARNING | MB_OKCANCEL);
+			g_title, MB_ICONWARNING | MB_OKCANCEL);
 		return button == IDOK;
 	}
 

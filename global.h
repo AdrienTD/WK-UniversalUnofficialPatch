@@ -21,10 +21,9 @@ typedef unsigned short ushort;
 typedef unsigned int uint;
 
 extern const wchar_t* const g_uupVersionDisplay;
+extern const wchar_t* const g_title;
 
-extern const wchar_t* const title;
-extern char tbuf[512];
-extern char battles;
+extern bool g_isBattles;
 
 extern char setting_higher_time_precision, setting_custom_campaign_crash_fix,
 	setting_use_data_directory, setting_use_multi_bcp,
