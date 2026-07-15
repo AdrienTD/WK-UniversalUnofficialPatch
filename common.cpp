@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include <io.h>
+#include <array>
 
 typedef void *(WINAPI *ftDirect3DCreate8)(int SDKVersion);
 
@@ -13,7 +14,7 @@ typedef void *(WINAPI *ftDirect3DCreate8)(int SDKVersion);
 #define STRINGIFY_VERSION(a,b) STRVER_STRINGIFY(PATCH_VERSION_MAJOR) "." STRVER_STRINGIFY(PATCH_VERSION_MINOR)
 static const wchar_t* const g_uupVersionDisplay = L"UUP " STRVER_WIDE_LITERAL(STRINGIFY_VERSION(PATCH_VERSION_MAJOR, PATCH_VERSION_MINOR));
 
-char title[] = "WK Universal Unofficial Patch";
+static const wchar_t* const title = L"WK Universal Unofficial Patch";
 HMODULE d3d8 = 0;
 ftDirect3DCreate8 oriDirect3DCreate8;
 char *exeep, oldepcode[5];
@@ -47,18 +48,18 @@ void atow(char *a, wchar_t *w, uint ms)
 
 void *WINAPI myDirect3DCreate8(int SDKVersion)
 {
-	char tbuf[128];
+	wchar_t tbuf[MAX_PATH];
 	if(!d3d8)
 	{
-		if(_access("apd3d8.dll", 0) != -1) // If apd3d8.dll exists.
+		if(_waccess(L"apd3d8.dll", 0) != -1) // If apd3d8.dll exists.
 		{
-			d3d8 = LoadLibrary("apd3d8.dll");
+			d3d8 = LoadLibraryW(L"apd3d8.dll");
 		}
 		else
 		{
-			GetSystemDirectory(tbuf, sizeof(tbuf)/sizeof(tbuf[0]));
-			strcat_s(tbuf, sizeof(tbuf)/sizeof(tbuf[0])-1, "\\d3d8.dll");
-			d3d8 = LoadLibrary(tbuf);
+			GetSystemDirectoryW(tbuf, std::size(tbuf));
+			wcscat_s(tbuf, L"\\d3d8.dll");
+			d3d8 = LoadLibraryW(tbuf);
 		}
 	}
 	oriDirect3DCreate8 = (ftDirect3DCreate8)GetProcAddress(d3d8, "Direct3DCreate8");
@@ -75,9 +76,9 @@ DWORD WINAPI myGetTickCount(void)
 
 void msmpegfailedmsg(int x)
 {
-	char b[256];
-	sprintf(b, "Failed to build graph with only MS MPEG codecs!\nReason: %i\nPlease tell me about this problem! Thanks!", x);
-	MessageBox(0, b, title, 16);
+	wchar_t b[256];
+	swprintf_s(b, L"Failed to build graph with only MS MPEG codecs!\nReason: %i\nPlease tell me about this problem! Thanks!", x);
+	MessageBoxW(0, b, title, 16);
 	ExitProcess(-1);
 }
 
@@ -112,8 +113,6 @@ int __stdcall BuildMsMpegGraph(IGraphBuilder *gb, IPin *psrcout)
 	mss->Release();
 	mad->Release();
 
-	//MessageBox(0, "Success!", 0, 64);
-	//hr = -1; msmpegfail(1999);
 	return 0;
 }
 
@@ -136,26 +135,26 @@ void NopifyCode(void* p, uint count)
 
 int VerifyVersion()
 {
-	char mname[256];
+	wchar_t mname[MAX_PATH];
 	DWORD vsize, unk, v;
 	UINT valueOutSize;
 	void *vpnt;
 	VS_FIXEDFILEINFO *ffi;
 
-	GetModuleFileName(NULL, mname, 127);
-	vsize = GetFileVersionInfoSize(mname, &unk);
+	GetModuleFileNameW(NULL, mname, std::size(mname)-1);
+	vsize = GetFileVersionInfoSizeW(mname, &unk);
 	if(!vsize) return -1;
 	vpnt = (void*)malloc(vsize);
 	if(!vpnt) return -1;
-	if(!GetFileVersionInfo(mname, 0, vsize, vpnt)) return -1;
-	if(!VerQueryValue(vpnt, "\\", (void**)&ffi, &valueOutSize)) return -1;
+	if(!GetFileVersionInfoW(mname, 0, vsize, vpnt)) return -1;
+	if(!VerQueryValueW(vpnt, L"\\", (void**)&ffi, &valueOutSize)) return -1;
 	if(valueOutSize == 0) return -1;
 	v = LOWORD(ffi->dwFileVersionLS);
 	battles = v <= 152;
 	if((v != 152) && (v != 366))
 	{
-		sprintf(mname, "You are using WK%s Build %u.\nBut this patch only works on:\n - WK v1.4 (Build 366)\n - WK - Battles v1.23 (Build 152)\nYou can continue, but the game will still not be patched.", battles ? " - Battles" : "", v);
-		if(MessageBox(0, mname, title, MB_ICONERROR | MB_OKCANCEL) != IDOK)
+		swprintf_s(mname, L"You are using WK%s Build %u.\nBut this patch only works on:\n - WK v1.4 (Build 366)\n - WK - Battles v1.23 (Build 152)\nYou can continue, but the game will still not be patched.", battles ? L" - Battles" : L"", v);
+		if(MessageBoxW(0, mname, title, MB_ICONERROR | MB_OKCANCEL) != IDOK)
 			ExitProcess('UUP0');
 	}
 	return 1;
@@ -232,7 +231,7 @@ void PatchStart()
 	textSectionProtectionChange.apply();
 
 	if(!battles) PatchStart_WKO();
-	else PatchStart_WKB(); //MessageBox(0, "Battles!", title, 64);
+	else PatchStart_WKB();
 
 	// Restore entry point code.
 	memcpy(exeep, oldepcode, 5);

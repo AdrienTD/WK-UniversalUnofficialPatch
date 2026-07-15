@@ -2,6 +2,9 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
+#define UNICODE
+#define _UNICODE
+
 #include <windows.h>
 #include <stdio.h>
 #include <dshow.h>
@@ -19,7 +22,7 @@ typedef unsigned int uint;
 
 extern const wchar_t* const g_uupVersionDisplay;
 
-extern char title[];
+extern const wchar_t* const title;
 extern char tbuf[512];
 extern char battles;
 
