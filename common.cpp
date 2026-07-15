@@ -74,15 +74,15 @@ DWORD WINAPI myGetTickCount(void)
 	return (count.QuadPart * 1000) / freq.QuadPart;
 }
 
-void msmpegfailedmsg(int x)
+void CheckMsMpegFailure(HRESULT hr, int x)
 {
+	if(!FAILED(hr))
+		return;
 	wchar_t b[256];
 	swprintf_s(b, L"Failed to build graph with only MS MPEG codecs!\nReason: %i\nPlease tell me about this problem! Thanks!", x);
 	MessageBoxW(0, b, g_title, 16);
 	ExitProcess(-1);
 }
-
-#define msmpegfail(x) if(FAILED(hr)) msmpegfailedmsg(x);
 
 int __stdcall BuildMsMpegGraph(IGraphBuilder *gb, IPin *psrcout)
 {
@@ -91,20 +91,20 @@ int __stdcall BuildMsMpegGraph(IGraphBuilder *gb, IPin *psrcout)
 	IPin *pmssin, *pmssout, *pmadin, *pmadout;
 
 	hr = CoCreateInstance(CLSID_MPEG1Splitter, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void**)&mss);
-	msmpegfail(1);
+	CheckMsMpegFailure(hr, 1);
 	hr = CoCreateInstance(CLSID_CMpegAudioCodec, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void**)&mad);
-	msmpegfail(2);
+	CheckMsMpegFailure(hr, 2);
 
-	hr = gb->AddFilter(mss, L"WKUUP MPEG Stream Splitter"); msmpegfail(3);
-	hr = gb->AddFilter(mad, L"WKUUP MPEG Audio Decoder"); msmpegfail(4);
+	hr = gb->AddFilter(mss, L"WKUUP MPEG Stream Splitter"); CheckMsMpegFailure(hr, 3);
+	hr = gb->AddFilter(mad, L"WKUUP MPEG Audio Decoder"); CheckMsMpegFailure(hr, 4);
 
-	hr = mss->FindPin(L"Input", &pmssin);		msmpegfail(5);
-	hr = mad->FindPin(L"In", &pmadin);			msmpegfail(6);
-	hr = gb->ConnectDirect(psrcout, pmssin, NULL);	msmpegfail(7);
-	hr = mss->FindPin(L"Audio", &pmssout);		msmpegfail(8);
-	hr = gb->ConnectDirect(pmssout, pmadin, NULL);	msmpegfail(9);
-	hr = mad->FindPin(L"Out", &pmadout);		msmpegfail(10);
-	hr = gb->Render(pmadout);				msmpegfail(11);
+	hr = mss->FindPin(L"Input", &pmssin);		CheckMsMpegFailure(hr, 5);
+	hr = mad->FindPin(L"In", &pmadin);			CheckMsMpegFailure(hr, 6);
+	hr = gb->ConnectDirect(psrcout, pmssin, NULL);	CheckMsMpegFailure(hr, 7);
+	hr = mss->FindPin(L"Audio", &pmssout);		CheckMsMpegFailure(hr, 8);
+	hr = gb->ConnectDirect(pmssout, pmadin, NULL);	CheckMsMpegFailure(hr, 9);
+	hr = mad->FindPin(L"Out", &pmadout);		CheckMsMpegFailure(hr, 10);
+	hr = gb->Render(pmadout);				CheckMsMpegFailure(hr, 11);
 
 	pmssin->Release();
 	pmssout->Release();
