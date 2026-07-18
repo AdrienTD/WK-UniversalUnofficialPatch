@@ -40,6 +40,7 @@ extern bool setting_ui_performance_improvements,
             setting_ui_messagebox_double_text_render_fix;
 
 void atow(char *a, wchar_t *w, uint ms);
+int __stdcall UupMessage(const wchar_t* text, UINT flags);
 DWORD WINAPI myGetTickCount(void);
 
 void SetImmediateJump(void *p, uint j);

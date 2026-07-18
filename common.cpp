@@ -4,6 +4,7 @@
 #include "global.h"
 #include <io.h>
 #include <array>
+#include <shellapi.h>
 
 typedef void *(WINAPI *ftDirect3DCreate8)(int SDKVersion);
 
@@ -46,6 +47,23 @@ void atow(char *a, wchar_t *w, uint ms)
 	w[l] = 0;
 }
 
+void CALLBACK UupMessageCallback(LPHELPINFO lpHelpInfo)
+{
+	ShellExecuteW(NULL, NULL, L"https://github.com/AdrienTD/WK-UniversalUnofficialPatch/wiki", NULL, NULL, SW_SHOWNORMAL);
+}
+
+int __stdcall UupMessage(const wchar_t* text, UINT flags)
+{
+	MSGBOXPARAMSW param;
+	memset(&param, 0, sizeof(param));
+	param.cbSize = sizeof(param);
+	param.lpszText = text;
+	param.lpszCaption = g_title;
+	param.dwStyle = flags | MB_HELP;
+	param.lpfnMsgBoxCallback = UupMessageCallback;
+	return MessageBoxIndirectW(&param);
+}
+
 void *WINAPI myDirect3DCreate8(int SDKVersion)
 {
 	wchar_t tbuf[MAX_PATH];
@@ -80,7 +98,7 @@ void CheckMsMpegFailure(HRESULT hr, int x)
 		return;
 	wchar_t b[256];
 	swprintf_s(b, L"Failed to build graph with only MS MPEG codecs!\nReason: %i\nPlease tell me about this problem! Thanks!", x);
-	MessageBoxW(0, b, g_title, 16);
+	UupMessage(b, MB_ICONERROR);
 	ExitProcess(-1);
 }
 
@@ -154,7 +172,7 @@ int VerifyVersion()
 	if((v != 152) && (v != 366))
 	{
 		swprintf_s(mname, L"You are using WK%s Build %u.\nBut this patch only works on:\n - WK v1.4 (Build 366)\n - WK - Battles v1.23 (Build 152)\nYou can continue, but the game will still not be patched.", g_isBattles ? L" - Battles" : L"", v);
-		if(MessageBoxW(0, mname, g_title, MB_ICONERROR | MB_OKCANCEL) != IDOK)
+		if(UupMessage(mname, MB_ICONERROR | MB_OKCANCEL) != IDOK)
 			ExitProcess('UUP0');
 	}
 	return 1;
