@@ -4,6 +4,7 @@
 #include "global.h"
 #include <io.h>
 #include <array>
+#include <string>
 #include <shellapi.h>
 
 typedef void *(WINAPI *ftDirect3DCreate8)(int SDKVersion);
@@ -151,6 +152,49 @@ void NopifyCode(void* p, uint count)
 	memset(p, 0x90, count);
 }
 
+bool IsBuildBattles(int buildNumber)
+{
+	return buildNumber <= 155;
+}
+
+int GetBuildMinorVersion(int buildNumber)
+{
+	switch(buildNumber) {
+		// Battles:
+		case 125: return 0; // Demo
+		case 128: return 0;
+		case 141: return 1;
+		case 152: return 23;
+		case 155: return 23; // Traditional Chinese
+
+		// WK1:
+		case 334: return 0; // Demo
+		case 345: return 0;
+		case 355: return 2;
+		case 356: return 3;
+		case 366: return 4;
+	}
+	return -1;
+}
+
+std::string GetBuildName(int buildNumber)
+{
+	std::string name = IsBuildBattles(buildNumber) ? "Warrior Kings - Battles" : "Warrior Kings";
+	name += " v1.";
+
+	const int minorVersion = GetBuildMinorVersion(buildNumber);
+	name += minorVersion != -1 ? std::to_string(minorVersion) : std::string("?");
+
+	if(buildNumber == 155)
+		name += " (Traditional Chinese)";
+
+	name += " (Build ";
+	name += std::to_string(buildNumber);
+	name += ")";
+		
+	return name;
+}
+
 int VerifyVersion()
 {
 	wchar_t mname[MAX_PATH];
@@ -168,11 +212,19 @@ int VerifyVersion()
 	if(!VerQueryValueW(vpnt, L"\\", (void**)&ffi, &valueOutSize)) return -1;
 	if(valueOutSize == 0) return -1;
 	v = LOWORD(ffi->dwFileVersionLS);
-	g_isBattles = v <= 152;
+	g_isBattles = IsBuildBattles(v);
 	if((v != 152) && (v != 366))
 	{
-		swprintf_s(mname, L"You are using WK%s Build %u.\nBut this patch only works on:\n - WK v1.4 (Build 366)\n - WK - Battles v1.23 (Build 152)\nYou can continue, but the game will still not be patched.", g_isBattles ? L" - Battles" : L"", v);
-		if(UupMessage(mname, MB_ICONERROR | MB_OKCANCEL) != IDOK)
+		const std::string buildName = GetBuildName(v);
+		const std::string reqBuildName = GetBuildName(g_isBattles ? 152 : 366);
+		wchar_t buf[512];
+		swprintf_s(buf,
+			L"You are currently using:\n - %S\n\n"
+			L"But the WK Universal Unofficial Patch requires the following game version:\n - %S\n\n"
+			L"The game first needs to be updated to the required version with official patches, before using this unofficial patch. Click \"Help\" for more details.\n\n"
+			L"You can continue, but the game will still not be patched.",
+			buildName.c_str(), reqBuildName.c_str());
+		if(UupMessage(buf, MB_ICONERROR | MB_OKCANCEL) != IDOK)
 			ExitProcess('UUP0');
 	}
 	return 1;
