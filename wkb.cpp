@@ -342,9 +342,9 @@ bool __stdcall VerifyPatch1_1Data()
 	if(file.GetFileSize() == 155371)
 	{
 		int button = UupMessage(
-			L"v1.0 data detected!\n\n"
-			L"New game data have been introduced since Version 1.1, but they are currently missing.\n\n"
-			L"Please install the patch 1.1 data, particularly the file \"patch_1_1.bcp\", and keep the v1.23 executable.\n\n"
+			L"v1.0 game data files detected!\n\n"
+			L"You are currently using the WKB v1.23 executable, which is good. However, the game files in data.bcp still contains data from v1.0.\n\n"
+			L"Please install the patch 1.1 data, particularly the file \"patch_1_1.bcp\", and keep the v1.23 executable. Click \"Help\" for more details.\n\n"
 			L"You can continue, but without the patch 1.1 data, you will get the following issues:\n"
 			L" - Some bugs and unbalances from v1.0 will still be present, even with a v1.23 exe. (For example, monks can be converted to peasants, etc.)\n"
 			L" - You may also not be able to join multiplayer games.",
