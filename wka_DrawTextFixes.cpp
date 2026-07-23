@@ -142,6 +142,19 @@ void PatchDrawLabelTextBufferOverflow_WKB()
 	*(uint*)0x72404E -= 0x800;
 }
 
+void* g_CCwEditBox__OnChar_originalPtr = nullptr;
+void naked CCwEditBox__OnChar_NoPercentage(int a, int b, int c, int d)
+{
+	__asm {
+		cmp dword ptr [esp+4], '%'
+		jz skip
+		mov eax, g_CCwEditBox__OnChar_originalPtr
+		jmp eax
+	skip:
+		ret 0x10
+	}
+}
+
 
 void PatchStart_WKO_DrawTextFixes()
 {
@@ -169,6 +182,12 @@ void PatchStart_WKO_DrawTextFixes()
 	}
 
     PatchDrawLabelTextBufferOverflow_WKO();
+
+    // Forbid typing the % character in edit boxes
+    // Reason is to prevent players to accidently send % to unpatched clients in multiplayer.
+	g_CCwEditBox__OnChar_originalPtr = (void*)0x0058B410;
+	for(uint vftAddress : {0x6A23D0, 0x6A4580, 0x6A5C40, 0x6A60B8})
+		*(void**)vftAddress = CCwEditBox__OnChar_NoPercentage;
 }
 
 
@@ -200,9 +219,7 @@ void PatchStart_WKB_DrawTextFixes()
 
     // Forbid typing the % character in edit boxes
     // Reason is to prevent players to accidently send % to unpatched clients in multiplayer.
-    for(uint editBoxAllowedCharsAddress : {0x71FFCC, 0x720030}) {
-        // bools of allowed chars from '"' (0x22) to '|' (0x7C)
-        uchar* editBoxAllowedChars = (uchar*)editBoxAllowedCharsAddress;
-        editBoxAllowedChars['%' - 0x22] = 0;
-    }
+	g_CCwEditBox__OnChar_originalPtr = (void*)0x0071FE60;
+	for(uint vftAddress : {0x84603C, 0x8482E4, 0x84A4FC})
+		*(void**)vftAddress = CCwEditBox__OnChar_NoPercentage;
 }
