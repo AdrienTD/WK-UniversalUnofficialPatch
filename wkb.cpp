@@ -371,6 +371,28 @@ naked void loc_6BA7FF_VerifyForPatch1_1Data()
 	}
 }
 
+void __stdcall ResizeGameWindow(HWND hWnd, int width, int height, DWORD flags)
+{
+	RECT rect = {0, 0, width, height};
+	AdjustWindowRect(&rect, flags, FALSE);
+	SetWindowPos(hWnd, NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOCOPYBITS | SWP_NOREDRAW);
+	ShowWindow(hWnd, SW_NORMAL);
+}
+
+naked void loc_5C4032_ImproveWindowSizeAdjusting()
+{
+	__asm {
+		push 0x00CF0000
+		push edi
+		push ecx
+		push ebx
+		call ResizeGameWindow
+
+		mov eax, 0x5C407C
+		jmp eax
+	}
+}
+
 void PatchStart_WKB_UiPerformanceImprovements();
 void PatchStart_WKB_DrawTextFixes();
 
@@ -459,7 +481,11 @@ void PatchStart_WKB()
 	if(setting_apply_bcm_sky_texture_and_fog_color)
 		SetImmediateJump((void*)0x41CF04, (uint)loc_41CF04_ApplySkyColorAndTextureFromBCM);
 
+	// Verify if patch 1.1 data files are present.
 	SetImmediateJump((void*)0x6BA7FF, (uint)loc_6BA7FF_VerifyForPatch1_1Data);
+
+	// Fix initial window size not matching rendering resolution
+	SetImmediateJump((void*)0x5C4032, (uint)loc_5C4032_ImproveWindowSizeAdjusting);
 
 	PatchStart_WKB_UiPerformanceImprovements();
 	PatchStart_WKB_DrawTextFixes();
