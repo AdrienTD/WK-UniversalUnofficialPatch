@@ -33,6 +33,7 @@ char setting_higher_time_precision = 1, setting_custom_campaign_crash_fix = 1,
 	setting_map_editor_hacks = 1, setting_show_all_screen_resolutions = 1,
 	setting_dshow_force_ms_mpeg_codecs = 1, setting_dshow_no_default_syncsrc = 0,
 	setting_dshow_waitforcompletion_immediate = 1, setting_dshow_no_bitrate_limit = 1,
+	setting_dshow_unresponsive_window_fix = 1,
 	setting_allow_multiple_instances = 0, setting_apply_bcm_sky_texture_and_fog_color = 1;
 
 bool setting_ui_performance_improvements = false,
@@ -133,6 +134,38 @@ int __stdcall BuildMsMpegGraph(IGraphBuilder *gb, IPin *psrcout)
 	mad->Release();
 
 	return 0;
+}
+
+void __stdcall DisableDirectShowEvents(IFilterGraph* filterGraph)
+{
+	if(!filterGraph)
+		return;
+
+	IMediaEventEx* mediaEventEx = nullptr;
+	HRESULT hr = filterGraph->QueryInterface(IID_IMediaEventEx, (void**)&mediaEventEx);
+	CheckMsMpegFailure(hr, 47);
+	// With NONOTIFY, the event handle is only set when the music is completed, nothing else.
+	// So we no longer need to use GetEvent and check the event code anymore.
+	mediaEventEx->SetNotifyFlags(AM_MEDIAEVENT_NONOTIFY);
+	mediaEventEx->Release();
+}
+
+int __stdcall WaitForMusicCompletion(IMediaEvent* mediaEvent, long msTimeout, long* pEvCode)
+{
+	// Game was using IMediaEvent::WaitForCompletion to check if music playing is complete.
+	// But for some reason, using it causes the game window to become unresponsive.
+	// Reasons could be:
+	//  - the hidden "ActiveMovie Window" and FilterGraph's thread do not run the message loop?
+	//  - mysterious "AMUnblock" message that is sometimes sent to the main thread,
+	//    but shouldn't it be sent to the FilterGraph's thread?
+	// Either the DirectShow implementation is buggy or it's not clear how it should be used.
+	// Anyway, here we just get the event handle and wait for it. This way we minimize
+	// running the possibly bugged DirectShow code.
+	// At least "AMUnblock" should no longer be sent to the main thread anymore.
+	HANDLE event;
+	mediaEvent->GetEventHandle((OAEVENT*)&event);
+	DWORD wait = WaitForSingleObject(event, 0);
+	return (wait == WAIT_OBJECT_0) ? 0 : -1;
 }
 
 void SetImmediateJump(void *p, uint j)
@@ -276,6 +309,8 @@ void ReadSettings()
 			setting_dshow_waitforcompletion_immediate = p;
 		else if(!stricmp(s, "dshow_no_bitrate_limit"))
 			setting_dshow_no_bitrate_limit = p;
+		else if(!stricmp(s, "dshow_unresponsive_window_fix"))
+			setting_dshow_unresponsive_window_fix = p;
 		else if(!stricmp(s, "allow_multiple_instances"))
 			setting_allow_multiple_instances = p;
 		else if(!stricmp(s, "apply_bcm_sky_texture_and_fog_color"))

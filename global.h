@@ -34,6 +34,7 @@ extern char setting_higher_time_precision, setting_custom_campaign_crash_fix,
 	setting_map_editor_hacks, setting_show_all_screen_resolutions,
 	setting_dshow_force_ms_mpeg_codecs, setting_dshow_no_default_syncsrc,
 	setting_dshow_waitforcompletion_immediate, setting_dshow_no_bitrate_limit,
+	setting_dshow_unresponsive_window_fix,
 	setting_allow_multiple_instances, setting_apply_bcm_sky_texture_and_fog_color;
 
 extern bool setting_ui_performance_improvements,
@@ -48,6 +49,8 @@ void SetImmediateCall(void *p, uint j);
 void NopifyCode(void* p, uint count);
 
 int __stdcall BuildMsMpegGraph(IGraphBuilder *gb, IPin *psrcout);
+void __stdcall DisableDirectShowEvents(IFilterGraph* filterGraph);
+int __stdcall WaitForMusicCompletion(IMediaEvent* mediaEvent, long msTimeout, long* pEvCode);
 
 void PatchStart_WKO();
 void PatchStart_WKB();

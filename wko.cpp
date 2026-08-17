@@ -163,6 +163,33 @@ naked void loc_5c802e_PatchVersionColor()
 	}
 }
 
+
+naked void loc_584377_DisableDirectShowEvents()
+{
+	__asm {
+		call CoCreateInstance
+		push dword ptr [esi]
+		call DisableDirectShowEvents
+		mov eax, 0x58437D
+		jmp eax
+	}
+}
+
+naked void loc_584698_FixMusicCompletionWaitCausingGhostWindow()
+{
+	__asm {
+		call WaitForMusicCompletion
+		test eax, eax
+		jz done
+	playing:
+		mov eax, 0x5846AE
+		jmp eax
+	done:
+		mov eax, 0x5846A2
+		jmp eax
+	}
+}
+
 void PatchVersionDisplay()
 {
 	// Game version text label coordinates
@@ -231,6 +258,12 @@ void PatchStart_WKO()
 	// Set first argument to 0 ms when calling IMediaEvent->WaitForCompletion.
 	if(setting_dshow_waitforcompletion_immediate)
 		*(char*)0x584696 = 0;
+
+	// Fix game window becoming "unresponsive" (ghost window) in windowed mode when music is on.
+	if(setting_dshow_unresponsive_window_fix) {
+		SetImmediateJump((void*)0x584377, (uint)loc_584377_DisableDirectShowEvents);
+		SetImmediateJump((void*)0x584698, (uint)loc_584698_FixMusicCompletionWaitCausingGhostWindow);
+	}
 
 	PatchStart_WKO_DrawTextFixes();
 

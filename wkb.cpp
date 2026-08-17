@@ -393,6 +393,32 @@ naked void loc_5C4032_ImproveWindowSizeAdjusting()
 	}
 }
 
+naked void loc_44248D_DisableDirectShowEvents()
+{
+	__asm {
+		call CoCreateInstance
+		push dword ptr [ebx]
+		call DisableDirectShowEvents
+		mov eax, 0x442493
+		jmp eax
+	}
+}
+
+naked void loc_442878_FixMusicCompletionWaitCausingGhostWindow()
+{
+	__asm {
+		call WaitForMusicCompletion
+		test eax, eax
+		jz done
+	playing:
+		mov eax, 0x44288E
+		jmp eax
+	done:
+		mov eax, 0x442882
+		jmp eax
+	}
+}
+
 void PatchStart_WKB_UiPerformanceImprovements();
 void PatchStart_WKB_DrawTextFixes();
 
@@ -486,6 +512,12 @@ void PatchStart_WKB()
 
 	// Fix initial window size not matching rendering resolution
 	SetImmediateJump((void*)0x5C4032, (uint)loc_5C4032_ImproveWindowSizeAdjusting);
+
+	// Fix game window becoming "unresponsive" (ghost window) in windowed mode when music is on.
+	if(setting_dshow_unresponsive_window_fix) {
+		SetImmediateJump((void*)0x44248D, (uint)loc_44248D_DisableDirectShowEvents);
+		SetImmediateJump((void*)0x442878, (uint)loc_442878_FixMusicCompletionWaitCausingGhostWindow);
+	}
 
 	PatchStart_WKB_UiPerformanceImprovements();
 	PatchStart_WKB_DrawTextFixes();
