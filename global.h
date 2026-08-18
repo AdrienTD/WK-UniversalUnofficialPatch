@@ -44,8 +44,8 @@ void atow(char *a, wchar_t *w, uint ms);
 int __stdcall UupMessage(const wchar_t* text, UINT flags);
 DWORD WINAPI myGetTickCount(void);
 
-void SetImmediateJump(void *p, uint j);
-void SetImmediateCall(void *p, uint j);
+void SetImmediateJump(void *p, uint j, uint size);
+void SetImmediateCall(void *p, uint j, uint size);
 void NopifyCode(void* p, uint count);
 
 int __stdcall BuildMsMpegGraph(IGraphBuilder *gb, IPin *psrcout);

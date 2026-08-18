@@ -168,16 +168,18 @@ int __stdcall WaitForMusicCompletion(IMediaEvent* mediaEvent, long msTimeout, lo
 	return (wait == WAIT_OBJECT_0) ? 0 : -1;
 }
 
-void SetImmediateJump(void *p, uint j)
+void SetImmediateJump(void *p, uint j, uint size)
 {
 	*(char*)p = 0xE9;
 	*(uint*)((char*)p+1) = j - ((uint)p + 5);
+	NopifyCode((char*)p + 5, size - 5);
 }
 
-void SetImmediateCall(void *p, uint j)
+void SetImmediateCall(void *p, uint j, uint size)
 {
 	*(char*)p = 0xE8;
 	*(uint*)((char*)p+1) = j - ((uint)p + 5);
+	NopifyCode((char*)p + 5, size - 5);
 }
 
 void NopifyCode(void* p, uint count)
@@ -375,7 +377,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 		memcpy(oldepcode, exeep, 5);
 
 		// Put a jump to our function at the beginning of the entry point code.
-		SetImmediateJump(exeep, (uint)EntryPointInterception);
+		SetImmediateJump(exeep, (uint)EntryPointInterception, 5);
 
 		// Put the .text section back to non-writable.
 		DWORD unused;

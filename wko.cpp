@@ -206,7 +206,7 @@ void PatchVersionDisplay()
 	*(uchar*)0x5C800A = 30; // top
 	*(uchar*)0x5C8019 = 0; // right
 	*(uchar*)0x5C8028 = 10; // bottom
-	SetImmediateJump((void*)0x5c802e, (uint)loc_5c802e_PatchVersionColor);
+	SetImmediateJump((void*)0x5c802e, (uint)loc_5c802e_PatchVersionColor, 6);
 }
 
 void PatchStart_WKO_DrawTextFixes();
@@ -246,12 +246,12 @@ void PatchStart_WKO()
 		*(ushort*)(0x45858c) = 0x9090;
 	// Allow custom multiplayer maps.
 	if(setting_custom_multiplayer_maps) {
-		SetImmediateJump((void*)0x5cf297, (uint)loc_5cf297);
-		SetImmediateJump((void*)0x5cfc04, (uint)loc_5cfc04);
+		SetImmediateJump((void*)0x5cf297, (uint)loc_5cf297, 5);
+		SetImmediateJump((void*)0x5cfc04, (uint)loc_5cfc04, 7);
 	}
 	// Force MS MPEG audio codecs to render music.
 	if(setting_dshow_force_ms_mpeg_codecs)
-		SetImmediateJump((void*)0x58444e, (uint)loc_58444e);
+		SetImmediateJump((void*)0x58444e, (uint)loc_58444e, 5);
 	// Avoid call to IFilterGraph->SetDefaultSyncSource.
 	if(setting_dshow_no_default_syncsrc)
 		*(uchar*)0x58446B = 0xEB; // jz short -> jmp short
@@ -261,8 +261,8 @@ void PatchStart_WKO()
 
 	// Fix game window becoming "unresponsive" (ghost window) in windowed mode when music is on.
 	if(setting_dshow_unresponsive_window_fix) {
-		SetImmediateJump((void*)0x584377, (uint)loc_584377_DisableDirectShowEvents);
-		SetImmediateJump((void*)0x584698, (uint)loc_584698_FixMusicCompletionWaitCausingGhostWindow);
+		SetImmediateJump((void*)0x584377, (uint)loc_584377_DisableDirectShowEvents, 6);
+		SetImmediateJump((void*)0x584698, (uint)loc_584698_FixMusicCompletionWaitCausingGhostWindow, 8);
 	}
 
 	PatchStart_WKO_DrawTextFixes();

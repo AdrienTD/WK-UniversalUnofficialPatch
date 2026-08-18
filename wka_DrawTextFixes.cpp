@@ -118,9 +118,9 @@ void __cdecl wcsncpy_SizeLimited2047AndNullTerminate(wchar_t* dest, const wchar_
 
 void PatchDrawLabelTextBufferOverflow_WKO()
 {
-	SetImmediateCall((void*)0x593EEC, (uint)wcsncpy_SizeLimited2047AndNullTerminate);
+	SetImmediateCall((void*)0x593EEC, (uint)wcsncpy_SizeLimited2047AndNullTerminate, 5);
 	NopifyCode((void*)0x593F08, 7);
-	SetImmediateCall((void*)0x593F72, (uint)wcsncpy_SizeLimited2047AndNullTerminate);
+	SetImmediateCall((void*)0x593F72, (uint)wcsncpy_SizeLimited2047AndNullTerminate, 5);
 	NopifyCode((void*)0x593F87, 10);
 
 	// Relocate addresses to line charbuf to word charbuf.
@@ -131,9 +131,9 @@ void PatchDrawLabelTextBufferOverflow_WKO()
 
 void PatchDrawLabelTextBufferOverflow_WKB()
 {
-	SetImmediateCall((void*)0x724046, (uint)wcsncpy_SizeLimited2047AndNullTerminate);
+	SetImmediateCall((void*)0x724046, (uint)wcsncpy_SizeLimited2047AndNullTerminate, 5);
 	NopifyCode((void*)0x724070, 10);
-	SetImmediateCall((void*)0x724122, (uint)wcsncpy_SizeLimited2047AndNullTerminate);
+	SetImmediateCall((void*)0x724122, (uint)wcsncpy_SizeLimited2047AndNullTerminate, 5);
 	NopifyCode((void*)0x724140, 8);
 
 	// Relocate addresses to line charbuf to word charbuf.
@@ -166,7 +166,7 @@ void PatchStart_WKO_DrawTextFixes()
     };
 
     for(int call : drawText2Calls) {
-		SetImmediateCall((void*)call, (uint)sub_WKDrawText2_WithoutFormatting_WKO);
+		SetImmediateCall((void*)call, (uint)sub_WKDrawText2_WithoutFormatting_WKO, 5);
 	}
 
 	static const int calcTextCalls[] = {
@@ -178,7 +178,7 @@ void PatchStart_WKO_DrawTextFixes()
     };
 
     for(int call : calcTextCalls) {
-		SetImmediateCall((void*)call, (uint)sub_WKCalcText_WithoutFormatting_WKO);
+		SetImmediateCall((void*)call, (uint)sub_WKCalcText_WithoutFormatting_WKO, 5);
 	}
 
     PatchDrawLabelTextBufferOverflow_WKO();
@@ -200,7 +200,7 @@ void PatchStart_WKB_DrawTextFixes()
 	};
 	
 	for(int call : drawText2Calls) {
-		SetImmediateCall((void*)call, (uint)sub_WKDrawText2_WithoutFormatting_WKB);
+		SetImmediateCall((void*)call, (uint)sub_WKDrawText2_WithoutFormatting_WKB, 5);
 	}
 	
 	static const int calcTextCalls[] = {
@@ -212,7 +212,7 @@ void PatchStart_WKB_DrawTextFixes()
 	};
 	
 	for(int call : calcTextCalls) {
-		SetImmediateCall((void*)call, (uint)sub_WKCalcText_WithoutFormatting_WKB);
+		SetImmediateCall((void*)call, (uint)sub_WKCalcText_WithoutFormatting_WKB, 5);
 	}
 
     PatchDrawLabelTextBufferOverflow_WKB();

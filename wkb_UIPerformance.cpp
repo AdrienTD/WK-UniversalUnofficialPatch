@@ -506,23 +506,23 @@ void PatchStart_WKB_UiPerformanceImprovements()
 {
 	// UI Rendering performance improvement
 	if(setting_ui_performance_improvements) {
-		SetImmediateJump((void*)0x5c58e8, (uint)loc_5c58e8_2DInterfaceRenderHook);
-		SetImmediateJump((void*)0x5c591e, (uint)loc_5c591e_2DInterfaceRenderLoopBreakHook);
-		SetImmediateJump((void*)0x77c435, (uint)loc_77c435_Outlined_Text_Optim);
+		SetImmediateJump((void*)0x5c58e8, (uint)loc_5c58e8_2DInterfaceRenderHook, 5);
+		SetImmediateJump((void*)0x5c591e, (uint)loc_5c591e_2DInterfaceRenderLoopBreakHook, 6);
+		SetImmediateJump((void*)0x77c435, (uint)loc_77c435_Outlined_Text_Optim, 8);
 
-		SetImmediateJump((void*)0x5bec85, (uint)loc_5bec85_StartOfDrawText);
-		SetImmediateJump((void*)0x5bf031, (uint)loc_5bf031_EndOfDrawText);
-		SetImmediateJump((void*)0x77c5aa, (uint)loc_77c5aa_StartOfDrawWindowBackground);
-		SetImmediateJump((void*)0x77c63c, (uint)loc_77c63c_EndOfDrawWindowBackground);
-		SetImmediateJump((void*)0x77c650, (uint)loc_77c650_StartOfDrawWindowBorder);
-		SetImmediateJump((void*)0x77cad6, (uint)loc_77cad6_EndOfDrawWindowBorder);
-		SetImmediateJump((void*)0x77caf4, (uint)loc_77caf4_StartOfDrawButtonBackground);
-		SetImmediateJump((void*)0x77ce3c, (uint)loc_77ce3c_EndOfDrawButtonBackground);
-		SetImmediateJump((void*)0x778fed, (uint)loc_778fed_StartOfDrawScrollBar);
-		SetImmediateJump((void*)0x7790ae, (uint)loc_7790ae_EndOfDrawScrollBar);
+		SetImmediateJump((void*)0x5bec85, (uint)loc_5bec85_StartOfDrawText, 6);
+		SetImmediateJump((void*)0x5bf031, (uint)loc_5bf031_EndOfDrawText, 7);
+		SetImmediateJump((void*)0x77c5aa, (uint)loc_77c5aa_StartOfDrawWindowBackground, 6);
+		SetImmediateJump((void*)0x77c63c, (uint)loc_77c63c_EndOfDrawWindowBackground, 7);
+		SetImmediateJump((void*)0x77c650, (uint)loc_77c650_StartOfDrawWindowBorder, 5);
+		SetImmediateJump((void*)0x77cad6, (uint)loc_77cad6_EndOfDrawWindowBorder, 7);
+		SetImmediateJump((void*)0x77caf4, (uint)loc_77caf4_StartOfDrawButtonBackground, 7);
+		SetImmediateJump((void*)0x77ce3c, (uint)loc_77ce3c_EndOfDrawButtonBackground, 7);
+		SetImmediateJump((void*)0x778fed, (uint)loc_778fed_StartOfDrawScrollBar, 5);
+		SetImmediateJump((void*)0x7790ae, (uint)loc_7790ae_EndOfDrawScrollBar, 7);
 
 		// Extension to the Performance Stats (that can be enabled via registry)
-		SetImmediateJump((void*)0x5c528e, (uint)loc_5c528e_CallDrawPerfStatsExtension);
+		SetImmediateJump((void*)0x5c528e, (uint)loc_5c528e_CallDrawPerfStatsExtension, 12);
 	}
 
 	// Fix UI message box text drawn twice

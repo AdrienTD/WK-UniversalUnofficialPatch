@@ -438,7 +438,7 @@ void PatchStart_WKB()
 	*(size_t*)&wkFuncPtr_Random_access_file_Read = 0x7523B0;
 
 	// Display UUP version in main menu.
-	SetImmediateJump((void*)0x771eed, (uint)loc_771eed_AdditionalUUPVersionDisplay);
+	SetImmediateJump((void*)0x771eed, (uint)loc_771eed_AdditionalUUPVersionDisplay, 5);
 
 	// Fix the unit teleportation by replacing GetTickCount with our own function in the IAT.
 	if(setting_higher_time_precision)
@@ -457,7 +457,7 @@ void PatchStart_WKB()
 	//	*(uchar*)(0x42296E) = 8;
 	// Allow custom multiplayer maps.
 	if(setting_custom_multiplayer_maps) {
-		SetImmediateJump((void*)0x6ee346, (uint)loc_6ee346);
+		SetImmediateJump((void*)0x6ee346, (uint)loc_6ee346, 9);
 		// This will avoid .sav files to be present in the skirmish map list:
 		//memset((void*)0x6ed8a7, 0x90, 12);
 	}
@@ -465,20 +465,20 @@ void PatchStart_WKB()
 	if(setting_map_editor_button)
 	{
 		*(uchar*)0x771741 = 0x90;
-		memset((void*)0x771748, 0x90, 5);
+		NopifyCode((void*)0x771748, 5);
 	}
 	// Makes the map editor usable.
 	if(setting_map_editor_hacks)
 	{
 		*(wchar_t**)0x4038ee = L"Maps\\Map_Textures\\%s";
-		SetImmediateJump((void*)0x41d260, (uint)loc_41d260);
-		SetImmediateJump((void*)0x41b07d, (uint)loc_41b07d);
-		SetImmediateJump((void*)0x41cfbc, (uint)loc_41cfbc);
+		SetImmediateJump((void*)0x41d260, (uint)loc_41d260, 5);
+		SetImmediateJump((void*)0x41b07d, (uint)loc_41b07d, 6);
+		SetImmediateJump((void*)0x41cfbc, (uint)loc_41cfbc, 6);
 	}
 
 	// Force MS MPEG audio codecs to render music.
 	if(setting_dshow_force_ms_mpeg_codecs)
-		SetImmediateJump((void*)0x442566, (uint)loc_442566);
+		SetImmediateJump((void*)0x442566, (uint)loc_442566, 5);
 	// Avoid call to IFilterGraph->SetDefaultSyncSource.
 	if(setting_dshow_no_default_syncsrc)
 		*(uchar*)0x442661 = 0xEB; // jz short -> jmp short
@@ -501,22 +501,22 @@ void PatchStart_WKB()
 
 	// Allow multiple instances of the game running
 	if(setting_allow_multiple_instances)
-		SetImmediateJump((void*)0x6BA875, (uint)loc_6BA875_AllowMultipleInstances);
+		SetImmediateJump((void*)0x6BA875, (uint)loc_6BA875_AllowMultipleInstances, 6);
 
 	// Avoid BCM sky box file path and fog color from being overidden/ignored.
 	if(setting_apply_bcm_sky_texture_and_fog_color)
-		SetImmediateJump((void*)0x41CF04, (uint)loc_41CF04_ApplySkyColorAndTextureFromBCM);
+		SetImmediateJump((void*)0x41CF04, (uint)loc_41CF04_ApplySkyColorAndTextureFromBCM, 6);
 
 	// Verify if patch 1.1 data files are present.
-	SetImmediateJump((void*)0x6BA7FF, (uint)loc_6BA7FF_VerifyForPatch1_1Data);
+	SetImmediateJump((void*)0x6BA7FF, (uint)loc_6BA7FF_VerifyForPatch1_1Data, 5);
 
 	// Fix initial window size not matching rendering resolution
-	SetImmediateJump((void*)0x5C4032, (uint)loc_5C4032_ImproveWindowSizeAdjusting);
+	SetImmediateJump((void*)0x5C4032, (uint)loc_5C4032_ImproveWindowSizeAdjusting, 6);
 
 	// Fix game window becoming "unresponsive" (ghost window) in windowed mode when music is on.
 	if(setting_dshow_unresponsive_window_fix) {
-		SetImmediateJump((void*)0x44248D, (uint)loc_44248D_DisableDirectShowEvents);
-		SetImmediateJump((void*)0x442878, (uint)loc_442878_FixMusicCompletionWaitCausingGhostWindow);
+		SetImmediateJump((void*)0x44248D, (uint)loc_44248D_DisableDirectShowEvents, 6);
+		SetImmediateJump((void*)0x442878, (uint)loc_442878_FixMusicCompletionWaitCausingGhostWindow, 8);
 	}
 
 	PatchStart_WKB_UiPerformanceImprovements();
