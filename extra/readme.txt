@@ -1,5 +1,5 @@
 WK Universal Unofficial Patch
-Version 0.94
+Version 0.95
 By AdrienTD
 https://github.com/AdrienTD/WK-UniversalUnofficialPatch
 
@@ -116,6 +116,41 @@ This patch contains:
 |    Release notes    |
 +---------------------+
 
+## v0.95
+
+* WKB Fix crash when displaying text on 4K/ultrawide resolutions
+  The game was crashing when displaying the AI General bio with a 4K resolution,
+  due to too many characters in a single line of text.
+
+* WK1+WKB Fix game window becoming "unresponsive"
+  Fixes an issue where Windows sometimes marks the game's window as unresponsive,
+  which only happened when the music was on. (Always the music causing problems...)
+
+* WKB Fix incorrect initial resolution in windowed mode
+  When launching the game in windowed mode, the window size did not match the resolution,
+  resulting in blurry text and graphics. Now fixed.
+
+* WKB v1.1 data check
+  On game launch, the patch will check that v1.1 game data is present
+  (the "patch_1_1.bcp" file). If not, it will be reported as a warning message.
+
+* WKB Apply fog+sky colors in BCM maps
+  With custom maps, the fog and sky colors set in the map were only applied
+  when the terrain was saved in the "SNR" format, but not the newer "BCM"
+  format.
+  Now with the patch, the colors will be applied on BCM maps as well.
+
+* WKB Allow multiple instances
+  When lauching the game, it checks if a previous process already exists, so
+  it does not launch a second instance.
+  The patch allows to bypass this, by adding this line to "wkuup_settings.txt":
+  
+  allow_multiple_instances 1
+
+* Improvements to the Message boxes from the Patch.
+  There is now a "Help" button which leads to the UUP Wiki page.
+
+
 ## v0.94
 
 * Fix patch compatibility with Wine.
@@ -211,11 +246,14 @@ When a setting is not specified in the file, it will take a default value.
 
 Here is a list of available settings and their default values:
 
+allow_multiple_instances             0
+apply_bcm_sky_texture_and_fog_color  1
 custom_campaign_crash_fix            1
 custom_multiplayer_maps              1
 dshow_force_ms_mpeg_codecs           1
 dshow_no_bitrate_limit               1
 dshow_no_default_syncsrc             0
+dshow_unresponsive_window_fix        1
 dshow_waitforcompletion_immediate    1
 enable_trace_action                  0
 enable_trace_value_action            0
