@@ -25,8 +25,8 @@ Definition:
   Examples where the game could be found:
     C:\Program Files (x86)\Microids\Warrior Kings
     C:\Program Files (x86)\Empire Interactive\Warrior Kings Battles
-	C:\Program Files (x86)\Steam\steamapps\common\Warrior Kings (Battles)
-	C:\Program Files (x86)\GOG Galaxy\Games\Warrior Kings (Battles)
+    C:\Program Files (x86)\Steam\steamapps\common\Warrior Kings (Battles)
+    C:\Program Files (x86)\GOG Galaxy\Games\Warrior Kings (Battles)
 
 To install the patch:
 
@@ -39,8 +39,8 @@ To install the patch:
  If you use Linux/Wine:
  3. Run `winecfg`, go to the Libraries tab, add a DLL override to d3d8,
     and set it to "Native then builtin", if this hasn't been done before.
-	For more info, see:
-	https://gitlab.winehq.org/wine/wine/-/wikis/Wine-User's-Guide#configuring-wine
+    For more info, see:
+    https://gitlab.winehq.org/wine/wine/-/wikis/Wine-User's-Guide#configuring-wine
 
 To verify if the installation went well, run the game. At the main menu, look
 at the version numbers in the right-bottom corner of the screen. If you see
