@@ -128,7 +128,7 @@ This patch contains:
 
 * WKB Fix incorrect initial resolution in windowed mode
   When launching the game in windowed mode, the window size did not match the resolution,
-  resulting in blurry text and graphics. Now fixed.
+  resulting in blurry text and graphics, until you resize the window. Now fixed.
 
 * WKB v1.1 data check
   On game launch, the patch will check that v1.1 game data is present
