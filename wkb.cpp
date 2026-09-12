@@ -4,6 +4,9 @@
 
 #include <string>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 /////
 
 class File
@@ -419,6 +422,154 @@ naked void loc_442878_FixMusicCompletionWaitCausingGhostWindow()
 	}
 }
 
+struct Bitmap
+{
+	void* vft;
+	int width;
+	int height;
+	void* data;
+};
+
+void __stdcall WriteBitmap(Bitmap* bitmap)
+{
+	std::unique_ptr<char[]> pix(new char[bitmap->width * bitmap->height * 4]);
+
+	memcpy(pix.get(), bitmap->data, bitmap->width * bitmap->height * 4);
+	for(int i = 0; i < bitmap->width * bitmap->height; ++i) {
+		std::swap(pix[4*i+0], pix[4*i+2]);
+		pix[4*i+3] = 0xFF;
+	}
+
+	static int count = 0;
+	char name[260];
+	sprintf_s(name, "uhh\\%04i.png", count++);
+	stbi_write_png(name, bitmap->width, bitmap->height, 4, pix.get(), bitmap->width * 4);
+}
+
+naked void loc_4151EE_WriteBCMMapTextures()
+{
+	__asm {
+		pushad
+		push eax
+		call WriteBitmap
+		popad
+		add esp, 0x14
+		ret 8
+	}
+}
+
+void __stdcall PrintGeneratedAtlasEntry(int textureGroup, int textureId, int xPos, int yPos, int tileTexSize)
+{
+	static FILE* file = fopen("GenAtlasLog_CopyTex.txt", "w");
+	if(!file) return;
+
+	fprintf(file, "%i, %i, %i, %i, %i\n", textureGroup, textureId, xPos, yPos, tileTexSize);
+	fflush(file);
+}
+
+naked void cr_4150F2_Log_CopyTextureToGeneratedAtlas()
+{
+	__asm {
+		push ecx
+		push dword ptr [esp+4+24]
+		push dword ptr [esp+4+24]
+		push dword ptr [esp+4+24]
+		push dword ptr [esp+4+20]
+		push dword ptr [esp+4+20]
+		call PrintGeneratedAtlasEntry
+		pop ecx
+		mov eax, 0x409940
+		jmp eax
+	}
+}
+
+void __stdcall PrintLoadTexFileAltCall(const char* fileName, int texMapType)
+{
+	static FILE* file = fopen("GenAtlasLog_LoadTex.txt", "w");
+	if(!file) return;
+
+	fprintf(file, "%i, %s\n", texMapType, fileName);
+	fflush(file);
+}
+
+naked void cr_409B3F_Log_EditorBmpManager_LoadTexFileAlt()
+{
+	__asm {
+		push ecx
+		push [esp+4+4+4] // ecx copy + return address + first stack arg
+		push [esp+4+4+4]
+		call PrintLoadTexFileAltCall
+		pop ecx
+		mov eax, 0x409be0
+		jmp eax
+	}
+}
+
+struct MapSourceBitmap
+{
+	Bitmap* bitmap;
+	char fileName[260];
+};
+
+void __stdcall PrintLog_MapSourceBitmap_CopyToAtlas(MapSourceBitmap* msb)
+{
+	static FILE* file = fopen("GenAtlasLog_MSBCopy.txt", "w");
+	if(!file) return;
+
+	static int count = 0;
+	char buf[300];
+	//sprintf_s(buf, "%04i_%s.png", count++, msb->fileName);
+	sprintf_s(buf, "%04i_%i.png", count++, strnlen_s(msb->fileName, 260));
+
+	std::string name = buf;
+	for(char& c : name) if(c == '\\' || c == '/' || c == ':') c = '_';
+	name = "bmpSource\\" + name;
+
+	Bitmap* bitmap = msb->bitmap;
+	std::unique_ptr<char[]> pix(new char[bitmap->width * bitmap->height * 4]);
+	memcpy(pix.get(), bitmap->data, bitmap->width * bitmap->height * 4);
+	for(int i = 0; i < bitmap->width * bitmap->height; ++i) {
+		std::swap(pix[4*i+0], pix[4*i+2]);
+		pix[4*i+3] = 0xFF;
+	}
+	stbi_write_png(name.c_str(), bitmap->width, bitmap->height, 4, pix.get(), bitmap->width * 4);
+}
+
+naked void cr_409BA1_Log_MapSourceBitmap_CopyToAtlas()
+{
+	__asm {
+		push ecx
+		push ecx
+		call PrintLog_MapSourceBitmap_CopyToAtlas
+		pop ecx
+		mov eax, 0x408e00
+		jmp eax
+	}
+}
+
+void __stdcall CopyNormalMapName(MapSourceBitmap* srcBitmap, const char* fileName)
+{
+	strncpy(srcBitmap->fileName, fileName, 260);
+}
+
+naked void loc_409C5F_FixEditorBitmapMissingNameForNormalMaps()
+{
+	__asm {
+		// Replaced instruction: Call the special editor_bitmap constructor for normal maps
+		mov eax, 0x408a80
+		call eax
+		push eax
+
+		push ebp	// fileName
+		push eax	// pointer to constructed editor_bitmap
+		call CopyNormalMapName
+
+		pop eax
+		mov ecx, 0x409c64
+		jmp ecx
+	}
+}
+
 void PatchStart_WKB_UiPerformanceImprovements();
 void PatchStart_WKB_DrawTextFixes();
 
@@ -518,6 +669,13 @@ void PatchStart_WKB()
 		SetImmediateJump((void*)0x44248D, (uint)loc_44248D_DisableDirectShowEvents, 6);
 		SetImmediateJump((void*)0x442878, (uint)loc_442878_FixMusicCompletionWaitCausingGhostWindow, 8);
 	}
+
+	// write tex
+	// SetImmediateJump((void*)0x4151ee, (uint)loc_4151EE_WriteBCMMapTextures, 6);
+	// SetImmediateCall((void*)0x4150f2, (uint)cr_4150F2_Log_CopyTextureToGeneratedAtlas, 5);
+	// SetImmediateCall((void*)0x409B3F, (uint)cr_409B3F_Log_EditorBmpManager_LoadTexFileAlt, 5);
+	// SetImmediateCall((void*)0x409BA1, (uint)cr_409BA1_Log_MapSourceBitmap_CopyToAtlas, 5);
+	SetImmediateJump((void*)0x409C5F, (uint)loc_409C5F_FixEditorBitmapMissingNameForNormalMaps, 5);
 
 	PatchStart_WKB_UiPerformanceImprovements();
 	PatchStart_WKB_DrawTextFixes();
