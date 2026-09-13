@@ -419,6 +419,43 @@ naked void loc_442878_FixMusicCompletionWaitCausingGhostWindow()
 	}
 }
 
+struct Bitmap
+{
+	void* vft;
+	int width;
+	int height;
+	void* data;
+};
+
+struct editor_bitmap
+{
+	Bitmap* bitmap;
+	char fileName[260];
+};
+
+void __stdcall CopyNormalMapName(editor_bitmap* srcBitmap, const char* fileName)
+{
+	strncpy(srcBitmap->fileName, fileName, 260);
+}
+
+naked void loc_409C5F_FixEditorBitmapUninitializedNameForNormalMaps()
+{
+	__asm {
+		// Replaced instruction: Call the special editor_bitmap constructor for normal maps
+		mov eax, 0x408a80
+		call eax
+		push eax
+
+		push ebp	// fileName
+		push eax	// pointer to constructed editor_bitmap
+		call CopyNormalMapName
+
+		pop eax
+		mov ecx, 0x409c64
+		jmp ecx
+	}
+}
+
 void PatchStart_WKB_UiPerformanceImprovements();
 void PatchStart_WKB_DrawTextFixes();
 
@@ -518,6 +555,13 @@ void PatchStart_WKB()
 		SetImmediateJump((void*)0x44248D, (uint)loc_44248D_DisableDirectShowEvents, 6);
 		SetImmediateJump((void*)0x442878, (uint)loc_442878_FixMusicCompletionWaitCausingGhostWindow, 8);
 	}
+
+	// Fix a bug where the normal maps of the terrain textures had their file names left uninitialized when
+	// stored in a cache (in editor_bitmap_manager class, which has a vector of editor_bitmap).
+	// This caused the game to randomly show normal maps of the terrain textures as diffuse maps (green tiles).
+	// It also caused cache access to the normal maps to always miss, so the same normal maps were always regenerated
+	// multiple times. Hence the fix also improves loading times (especially at 5/8).
+	SetImmediateJump((void*)0x409C5F, (uint)loc_409C5F_FixEditorBitmapUninitializedNameForNormalMaps, 5);
 
 	PatchStart_WKB_UiPerformanceImprovements();
 	PatchStart_WKB_DrawTextFixes();
