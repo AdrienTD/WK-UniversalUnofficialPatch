@@ -59,59 +59,6 @@ To uninstall the patch:
 
 
 
-+---------------+
-|    Content    |
-+---------------+
-
-This patch contains:
-
- - Music bug fixes, including:
-
-    - (WKB²) Fix game freezing for seconds every time the music changes.
-      This happened when a MP2 codec other than the one provided by Microsoft
-      was being used.
-
-    - Improve game framerate when music is on.
-      In the first WK, the mission introduction cinematic with the narrator now
-      becomes significantly smoother, going from 16 FPS to 60 FPS!
-
- - (WKO*) Bug where sight range events were not working properly is now fixed.
-    -> Fixes watchtowers/forts sometimes not firing/alerting automatically.
-    -> Fixes bug where the barbarians won't come to you in the Rescue Tomas
-       mission.
-    -> Fixes lots of other bugs related to sight range.
-
- - Higher time precision, fixing the famous unit teleportation bug.
-   [NOTE: this may still not be fully fixed, especially on fast systems]
-
- - (WKB²) Widescreen resolutions are now available in the graphics
-   options screen.
-
- - Modding abilities, including:
-
-    - You can use the "data" directory (placed in the same directory as the
-      EXE) to add AND replace game files. No need to create new BCP files.
-
-    - (WKO*) You can put multiple "mod"/"patch" BCP files in the same directory
-      as the EXE, which then get loaded by the patch. Mods made for WK Battles
-      CAN also work with the first WK (but this is not always the case!).
-      This is a backport of the feature available in WK Battles 1.1/1.23.
-
-    - (WKO*) Selecting a custom campaign (by placing a CAM file inside the
-      "Campaigns" directory in data(.bcp)/saved) won't crash anymore.
-
-    - You can add maps in the multiplayer/skirmish map list.
-
-    - (WKB²) The unused and unfinished in-game Map editor can be enabled,
-      with some bug fixes.
-
-    - Enable the TRACE and/or TRACE_VALUE actions.
-
-* only for the first Warrior Kings
-² only for Warrior Kings - Battles
-
-
-
 +---------------------+
 |    Release notes    |
 +---------------------+
@@ -201,22 +148,67 @@ This patch contains:
 
 ## v0.92
 
-Adds two fixes related to music:
+Adds two fixes related to music, and the WKB widescreen fix:
 
-* The first is forcing default MS MPEG codecs in Windows as these codecs are
+* (WKB) Fix game freezing for seconds every time the music changes.
+  This happened when a MP2 codec other than the one provided by Microsoft
+  was being used.
+
+  This is fixed by forcing the game to use the default Microsft MPEG codecs, as they are
   known to cause no problems. But if you experience problems and error messages,
-  you can desactivate this fix by creating a file named "wkuup_settings.txt"
+  you can disable this fix by creating a file named "wkuup_settings.txt"
   in the game's directory and writing the following line:
 
   dshow_force_ms_mpeg_codecs 0
 
-* The second is removing a useless wait when the game checks if the music has
+* (WK1+WKB) Improve game framerate when music is on.
+  In the first WK, the mission introduction cinematic with the narrator now
+  becomes significantly smoother, going from 16 FPS to 60 FPS!
+
+  This is done by removing a useless wait when the game checks if the music has
   ended. The result is that the game gets higher FPS but also higher CPU usage.
-  If you don't want a high CPU usage, then you can desactivate the fix by
+  If you don't want a high CPU usage, then you can disable the fix by
   creating a file named "wkuup_settings.txt" in the game's directory and
   writing the following line:
 
   dshow_waitforcompletion_immediate 0
+
+* (WKB) Widescreen resolutions are now available in the graphics
+  options screen.
+
+
+## v0.91
+
+The first release. It contained:
+
+* (WK1) Bug where sight range events were not working properly is now fixed.
+  -> Fixes watchtowers/forts sometimes not firing/alerting automatically.
+  -> Fixes bug where the barbarians won't come to you in the Rescue Tomas
+     mission.
+  -> Fixes lots of other bugs related to sight range.
+
+* Higher time precision, fixing the famous unit teleportation bug.
+  [NOTE: this may still not be fully fixed, especially on fast systems]
+
+* Modding abilities, including:
+
+  - You can use the "data" directory (placed in the same directory as the
+    EXE) to add AND replace game files. No need to create new BCP files.
+
+  - (WK1) You can put multiple "mod"/"patch" BCP files in the same directory
+    as the EXE, which then get loaded by the patch. Mods made for WK Battles
+    CAN also work with the first WK (but this is not always the case!).
+    This is a backport of the feature available in WK Battles 1.1/1.23.
+
+  - (WK1) Selecting a custom campaign (by placing a CAM file inside the
+    "Campaigns" directory in data(.bcp)/saved) won't crash anymore.
+
+  - You can add maps in the multiplayer/skirmish map list.
+
+  - (WKB) The unused and unfinished in-game Map editor can be enabled,
+    with some bug fixes.
+
+  - Enable the TRACE and/or TRACE_VALUE actions.
 
 
 
