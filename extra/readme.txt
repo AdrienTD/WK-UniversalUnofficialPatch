@@ -118,6 +118,18 @@ This patch contains:
 
 ## v0.95
 
+* WKB Fix "green tiles" on terrain
+  This fixes a bug where randomly some terrain tiles will turn into bright green squares
+  (basically swapped with a normal map).
+  The frequency of the bug depended on the PC config.
+  The bug was also causing normal maps to be loaded and converted multiple times,
+  storing duplicates in memory, even when no green squares appeared. So fixing this also:
+  - slightly reduces level loading time (especially at the 5/8 phase), by around 1-2 seconds,
+    depending on the map.
+  - slightly reduces freeze time when you alt-tab back to the game or resize its window.
+  - lowers memory usage: in the Continent map, the game's RAM usage decreased by around 60 MB.
+  - fixes possible rare crash during level loading.
+
 * WKB Fix crash when displaying text on 4K/ultrawide resolutions
   The game was crashing when displaying the AI General bio with a 4K resolution,
   due to too many characters in a single line of text.
