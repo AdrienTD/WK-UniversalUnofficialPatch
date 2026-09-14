@@ -17,8 +17,6 @@ the game launches.
 |    Installation    |
 +--------------------+
 
-   /!\ Please do NOT copy the patch DLL to system32.
-
 Definition:
   The "game's directory" is where the folder/path where the game is installed,
   where the game executable is (Warrior_Kings.exe).
