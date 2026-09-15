@@ -61,7 +61,7 @@ To uninstall the patch:
 |    Release notes    |
 +---------------------+
 
-## v0.95
+## v0.95 -- 2026-09-16
 
 * WKB Fix "green tiles" on terrain
   This fixes a bug where randomly some terrain tiles will turn into bright green squares
@@ -108,7 +108,7 @@ To uninstall the patch:
   There is now a "Help" button which leads to the UUP Wiki page.
 
 
-## v0.94
+## v0.94 -- 2026-05-10
 
 * Fix patch compatibility with Wine.
   Previously, when using the patch on Wine, the game would crash at launch.
@@ -144,7 +144,7 @@ To uninstall the patch:
   ui_performance_improvements 1
 
 
-## v0.92
+## v0.92 -- 2017-07-29
 
 Adds two fixes related to music, and the WKB widescreen fix:
 
@@ -175,7 +175,7 @@ Adds two fixes related to music, and the WKB widescreen fix:
   options screen.
 
 
-## v0.91
+## v0.91 -- 2017-04-21
 
 The first release. It contained:
 
